@@ -1,21 +1,22 @@
-package ru.simbirsoft.homework.controller;
+package ru.simbirsoft.homework.person.controller;
 
-import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.simbirsoft.homework.dto.Person;
+import ru.simbirsoft.homework.person.dto.Person;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -43,23 +44,34 @@ public class PersonController {
         return persons;
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/")
     @ApiOperation(value = "Получить список людй по имени", httpMethod = "GET")
-    public List<Person> getPerson(@PathVariable String name){
-        return persons.stream().filter(p -> p.getFirstName().equals(name)).collect(Collectors.toList());
-
+    public List<Person> getPerson(@RequestParam String name){
+        List<Person> personList = persons.stream()
+                .filter(p -> p.getFirstName().equals(name))
+                .collect(Collectors.toList());
+        if(personList.isEmpty()){
+            throw new NullPointerException();
+        }
+        return personList;
     }
     @PostMapping("/")
     @ApiOperation(value = "Добавить человека в список", httpMethod = "POST")
-    public Object addPerson(@Valid @RequestBody Person person){
+    public List<Person> addPerson(@Valid @RequestBody Person person){
 
         persons.add(person);
-        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("firstName","lastName","middleName");
-        FilterProvider filters = new SimpleFilterProvider().addFilter("PersonFilter", filter);
-        MappingJacksonValue mapping = new MappingJacksonValue(persons);
-        mapping.setFilters(filters);
-
-        return mapping;
+        SimpleFilterProvider filterProvider = new SimpleFilterProvider();
+        filterProvider.addFilter("PersonFilter", SimpleBeanPropertyFilter.filterOutAllExcept("firstName","lastName","middleName"));
+        ObjectMapper om = new ObjectMapper();
+        om.setFilterProvider(filterProvider);
+        List<Person> resultList =  null;
+        try {
+            String json = om.writeValueAsString(persons);
+            resultList = om.readValue(json,new TypeReference<List<Person>>(){});
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return resultList;
     }
 
     @DeleteMapping("/")
@@ -68,11 +80,11 @@ public class PersonController {
                                                String lastName,
                                                String middleName) {
         if (persons.stream().anyMatch(p ->
-                p.getFirstName().equals(firstName) &&
+                        p.getFirstName().equals(firstName) &&
                         p.getLastName().equals(lastName) &&
                         p.getMiddleName().equals(middleName))) {
             persons.removeIf(p ->
-                    p.getFirstName().equals(firstName) &&
+                            p.getFirstName().equals(firstName) &&
                             p.getLastName().equals(lastName) &&
                             p.getMiddleName().equals(middleName));
             return new ResponseEntity<>(HttpStatus.OK);

@@ -1,22 +1,23 @@
-package ru.simbirsoft.homework.controller;
+package ru.simbirsoft.homework.book.controller;
 
 
-import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.simbirsoft.homework.dto.Book;
+import ru.simbirsoft.homework.book.dto.Book;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -43,28 +44,40 @@ public class BookController {
         return books;
     }
 
-    @GetMapping("/{author}")
+    @GetMapping("/")
     @ApiOperation(value = "Получить список книг по автору", httpMethod = "GET")
-    public List<Book> getBook(@PathVariable String author) {
-      return books.stream().filter(p -> p.getAuthor().equals(author)).collect(Collectors.toList());
+    public List<Book> getBook(@RequestParam String author) {
+        List<Book> bookList = books.stream()
+                                    .filter(p -> p.getAuthor().equals(author))
+                                    .collect(Collectors.toList());
+        if(bookList.isEmpty()){
+            throw new NullPointerException();
+        }
+        return bookList;
     }
 
     @PostMapping("/")
     @ApiOperation(value = "Добавить книгу в список", httpMethod = "POST")
-    public MappingJacksonValue addPerson(@Valid @RequestBody Book book) {
-
+    public List<Book> addBook(@Valid @RequestBody Book book) {
         books.add(book);
-        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.filterOutAllExcept("name","author");
-        FilterProvider filters = new SimpleFilterProvider().addFilter("BookFilter", filter);
-        MappingJacksonValue mapping = new MappingJacksonValue(books);
-        mapping.setFilters(filters);
+        SimpleFilterProvider filterProvider = new SimpleFilterProvider();
+        filterProvider.addFilter("BookFilter", SimpleBeanPropertyFilter.filterOutAllExcept("name","author"));
+        ObjectMapper om = new ObjectMapper();
+        om.setFilterProvider(filterProvider);
+        List<Book> resultList = null;
+       try {
+           String json = om.writeValueAsString(books);
+           resultList = om.readValue(json, new TypeReference<List<Book>>(){});
 
-        return mapping;
+       }catch (JsonProcessingException e){
+           e.printStackTrace();
+       }
+        return resultList;
     }
 
     @DeleteMapping("/")
     @ApiOperation(value = "Удалить книгу из списка", httpMethod = "DELETE")
-    public ResponseEntity<Book> removePerson(String author,
+    public ResponseEntity<Book> removeBook(String author,
                                              String name) {
         if (books.stream().anyMatch(b ->
                         b.getAuthor().equals(author) &&

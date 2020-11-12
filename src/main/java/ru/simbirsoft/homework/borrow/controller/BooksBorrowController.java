@@ -1,4 +1,4 @@
-package ru.simbirsoft.homework.controller;
+package ru.simbirsoft.homework.borrow.controller;
 
 
 import io.swagger.annotations.Api;
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.simbirsoft.homework.dto.BooksBorrow;
+import ru.simbirsoft.homework.borrow.dto.BooksBorrow;
 
 import javax.validation.Valid;
 import java.util.ArrayList;

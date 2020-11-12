@@ -1,16 +1,19 @@
-package ru.simbirsoft.homework.dto;
+package ru.simbirsoft.homework.book.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @ApiModel(description = "Человек")
 @JsonFilter("BookFilter")
 public class Book {
@@ -25,5 +28,7 @@ public class Book {
 
     @NotNull(message = "Genre cannot be null")
     @ApiModelProperty(value = "Жанр книги", example = "Ужасы")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String genre;
+
 }
