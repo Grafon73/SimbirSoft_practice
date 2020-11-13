@@ -1,7 +1,7 @@
 package ru.simbirsoft.homework.person.dto;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -15,19 +15,21 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "Книга")
-@JsonFilter("PersonFilter")
 public class Person {
 
     @NotNull(message = "First Name cannot be null")
     @ApiModelProperty(value = "Имя", example = "Иван")
+    @JsonView(Person.class)
     private String firstName;
 
     @NotNull(message = "Last Name cannot be null")
     @ApiModelProperty(value = "Фамилия", example = "Иванов")
+    @JsonView(Person.class)
     private String lastName;
 
     @NotNull(message = "Middle Name cannot be null")
     @ApiModelProperty(value = "Отчество", example = "Иванович")
+    @JsonView(Person.class)
     private String middleName;
 
     @NotNull(message = "Birth Date cannot be null")
