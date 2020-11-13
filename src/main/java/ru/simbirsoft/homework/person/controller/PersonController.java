@@ -25,7 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/person", produces = APPLICATION_JSON_VALUE)
 public class PersonController {
 
-    PersonService personService;
+ private final PersonService personService;
 
     @Autowired
     public PersonController(PersonService personService) {

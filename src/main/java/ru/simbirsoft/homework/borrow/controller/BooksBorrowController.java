@@ -20,7 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/borrow", produces = APPLICATION_JSON_VALUE)
 public class BooksBorrowController {
 
-  BorrowService borrowService;
+    private final BorrowService borrowService;
 
     public BooksBorrowController(BorrowService borrowService) {
         this.borrowService = borrowService;
