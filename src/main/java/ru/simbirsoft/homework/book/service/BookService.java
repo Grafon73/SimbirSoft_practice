@@ -1,14 +1,17 @@
 package ru.simbirsoft.homework.book.service;
 
-import org.springframework.http.ResponseEntity;
-import ru.simbirsoft.homework.book.dto.Book;
+import ru.simbirsoft.homework.author.view.AuthorWithoutBooks;
+import ru.simbirsoft.homework.book.view.BookView;
+import ru.simbirsoft.homework.book.view.BookViewWithoutAuthor;
+import ru.simbirsoft.homework.genre.view.GenreView;
 
 import java.util.List;
 
 
 public interface BookService {
-    List<Book> getAllBooks();
-    List<Book> getBook(String author);
-    List<Book> addBook(Book book);
-    ResponseEntity<Book> removeBook(String author,String name);
+    BookView addBook(BookView bookView);
+    void removeBook(Integer id);
+    BookView editGenre(BookViewWithoutAuthor bookView);
+    List<BookView> getBooks(AuthorWithoutBooks authorView);
+    List<BookView> getBooks(GenreView genreView);
 }
