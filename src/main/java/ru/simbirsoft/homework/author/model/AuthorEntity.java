@@ -13,8 +13,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -56,10 +59,41 @@ public class AuthorEntity {
     @Column(name = "middle_name")
     private String middleName;
 
+    /**
+     * Время создания записи
+     */
+    @Column(name = "create_date",columnDefinition = "timestamp with time zone")
+    private LocalDateTime created;
+
+    /**
+     * Время изменения записи
+     */
+    @Column(name = "update_date",columnDefinition = "timestamp with time zone")
+    private LocalDateTime updated;
+
     @OneToMany(
             cascade={CascadeType.PERSIST, CascadeType.MERGE},
-            mappedBy = "author")
+            mappedBy = "author",
+            orphanRemoval = true)
    private Set<BookEntity> books;
 
+    @PrePersist
+    protected void onCreate() {
+        created = LocalDateTime.now();
+    }
+    @PreUpdate
+    protected void onUpdate() {
+        updated = LocalDateTime.now();
+    }
 
+    public void setBooks(Set<BookEntity> books) {
+        if (this.books == null) {
+            this.books = books;
+        } else if (this.books != books) {
+            this.books.clear();
+            if (books != null) {
+                this.books.addAll(books);
+            }
+        }
+    }
 }

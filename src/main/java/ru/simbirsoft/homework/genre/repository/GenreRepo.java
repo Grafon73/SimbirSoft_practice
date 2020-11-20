@@ -9,5 +9,7 @@ public interface GenreRepo extends JpaRepository<GenreEntity,Integer> {
 
     @Query("select distinct count (g) from BookEntity g inner join g.genres b  where b.name=:genre")
     int countAllBooksByGenre(@Param("genre")String genre);
+    void removeAllByBooksIsNull();
+    GenreEntity findByName(String name);
 
 }

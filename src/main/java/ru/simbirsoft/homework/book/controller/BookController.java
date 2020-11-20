@@ -3,6 +3,7 @@ package ru.simbirsoft.homework.book.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,14 +24,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Api(value = "BookController", description = "Управление информацией о книгах")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(value = "/books", produces = APPLICATION_JSON_VALUE)
 public class BookController {
 
     private final BookService bookService;
-
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
 
     @PostMapping("/book")
     @ApiOperation(value = "Добавить книгу в список", httpMethod = "POST")

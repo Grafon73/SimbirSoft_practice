@@ -23,5 +23,10 @@ public interface GenreService {
     /**
      * Получить количество книг по Genre
      */
-    Long stats(GenreView genreView);
+    Integer stats(String name);
+
+    /**
+     * Удалить Genre
+     */
+    void remove(String name);
 }

@@ -3,6 +3,7 @@ package ru.simbirsoft.homework.author.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,14 +22,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Api(value = "AuthorController", description = "Управление авторами")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(value = "/authors", produces = APPLICATION_JSON_VALUE)
 public class AuthorController {
 
     private final AuthorService authorService;
-
-    public AuthorController(AuthorService authorService) {
-        this.authorService = authorService;
-    }
 
     @PostMapping("/author")
     @ApiOperation(value = "Добавить автора в список", httpMethod = "POST")

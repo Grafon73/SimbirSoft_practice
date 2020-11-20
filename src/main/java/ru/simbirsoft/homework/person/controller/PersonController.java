@@ -2,7 +2,7 @@ package ru.simbirsoft.homework.person.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,15 +24,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Api(value = "PersonController", description = "Управление информацией о людях")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(value = "/person", produces = APPLICATION_JSON_VALUE)
 public class PersonController {
 
- private final PersonService personService;
-
-    @Autowired
-    public PersonController(PersonService personService) {
-        this.personService = personService;
-    }
+    private final PersonService personService;
 
    @PostMapping("/")
    @ApiOperation(value = "Добавить человека в список", httpMethod = "POST")
@@ -46,8 +42,7 @@ public class PersonController {
    public ResponseEntity<PersonViewWithoutBooks> editPerson(
            @RequestParam Integer id,
            @Valid @RequestBody PersonViewWithoutBooks personView){
-      personService.editPerson(id,personView);
-      return ResponseEntity.ok(personView);
+      return ResponseEntity.ok(personService.editPerson(id,personView));
    }
 
    @DeleteMapping("/remove_by_id")
@@ -79,7 +74,7 @@ public class PersonController {
    @PostMapping("/return")
    @ApiOperation(value = "Убрать книгу из списка книг человека", httpMethod = "POST")
    public ResponseEntity<PersonView> returnBook(@RequestParam Integer personId,
-                                                @RequestParam String bookName){
+                                                 @RequestParam String bookName){
       return ResponseEntity.ok(personService.returnBook(personId,bookName));
    }
 

@@ -1,9 +1,10 @@
 package ru.simbirsoft.homework.author.service;
 
 import com.google.common.collect.Sets;
+import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.simbirsoft.homework.author.model.AuthorEntity;
 import ru.simbirsoft.homework.author.repository.AuthorRepo;
 import ru.simbirsoft.homework.author.view.AuthorView;
@@ -15,16 +16,12 @@ import ru.simbirsoft.homework.exception.MyCustomException;
 import java.util.List;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepo authorRepo;
     private final MapperFactory mapperFactory;
-
-    @Autowired
-    public AuthorServiceImpl(AuthorRepo authorRepo, MapperFactory mapperFactory) {
-        this.authorRepo = authorRepo;
-        this.mapperFactory = mapperFactory;
-    }
 
     @Override
     public List<AuthorWithoutBooks> all() {
@@ -66,10 +63,18 @@ public class AuthorServiceImpl implements AuthorService {
         if(authorEntity==null){
             throw new DataNotFound("Автора");
         }
-        if(!authorEntity.getBooks().isEmpty()){
-            throw new MyCustomException("Нельзя удалить автора пока есть его книги");
+        if(!authorEntity.getBooks().isEmpty()) {
+            authorEntity.getBooks().forEach(a -> {
+    if(a.getPersons()!=null) {
+        throw new MyCustomException(
+                String.format("Книга %s данного автора находится у человека",
+                        a.getName()));
+                }
+            });
+
         }
      authorRepo.delete(authorEntity);
+
     }
 
 }
