@@ -7,8 +7,23 @@ import java.util.List;
 
 
 public interface AuthorService {
-    List<AuthorWithoutBooks> all();
-    AuthorView listOfBooks(AuthorWithoutBooks authorView);
+    /**
+     * Список авторов
+     */
+    List<AuthorWithoutBooks> getAllAuthors();
+
+    /**
+     * Список книг автора
+     */
+    AuthorView listOfBooksByAuthor(AuthorWithoutBooks authorView);
+
+    /**
+     * Добавить автора
+     */
     AuthorView addAuthor(AuthorView authorView);
+
+    /**
+     * Удалить автора
+     */
     void removeAuthor(AuthorWithoutBooks authorView);
 }

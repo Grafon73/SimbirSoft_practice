@@ -5,7 +5,7 @@ import ma.glasnost.orika.MapperFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.simbirsoft.homework.book.model.BookEntity;
-import ru.simbirsoft.homework.exception.DataNotFound;
+import ru.simbirsoft.homework.exception.DataNotFoundException;
 import ru.simbirsoft.homework.genre.model.GenreEntity;
 import ru.simbirsoft.homework.genre.repository.GenreRepo;
 import ru.simbirsoft.homework.genre.view.GenreView;
@@ -26,7 +26,7 @@ public class GenreServiceImpl implements GenreService {
 
 
     @Override
-    public List<GenreView> all() {
+    public List<GenreView> getAllGenres() {
         List<GenreEntity> genreEntityList = genreRepo.findAll();
         return mapperFactory.getMapperFacade()
                 .mapAsList(genreEntityList,GenreView.class);
@@ -46,10 +46,9 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public void remove(String name) {
-        GenreEntity genre = genreRepo.findByName(name);
-        if(genre==null){
-            throw new DataNotFound("этого жанра");
-        }
+        GenreEntity genre = genreRepo.findByName(name)
+                .orElseThrow(() ->
+                        new DataNotFoundException("Этого жанра нет в базе данных"));
         List<BookEntity> books = new ArrayList<>(genre.getBooks());
         books.forEach(genre::removeBook);
         genreRepo.delete(genre);

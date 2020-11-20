@@ -10,8 +10,8 @@ import ru.simbirsoft.homework.author.repository.AuthorRepo;
 import ru.simbirsoft.homework.author.view.AuthorView;
 import ru.simbirsoft.homework.author.view.AuthorWithoutBooks;
 import ru.simbirsoft.homework.book.model.BookEntity;
-import ru.simbirsoft.homework.exception.DataNotFound;
-import ru.simbirsoft.homework.exception.MyCustomException;
+import ru.simbirsoft.homework.exception.CustomRuntimeException;
+import ru.simbirsoft.homework.exception.DataNotFoundException;
 
 import java.util.List;
 
@@ -24,51 +24,51 @@ public class AuthorServiceImpl implements AuthorService {
     private final MapperFactory mapperFactory;
 
     @Override
-    public List<AuthorWithoutBooks> all() {
+    public List<AuthorWithoutBooks> getAllAuthors() {
         return mapperFactory.getMapperFacade().mapAsList(authorRepo.findAll(),AuthorWithoutBooks.class);
     }
 
     @Override
-    public AuthorView listOfBooks(AuthorWithoutBooks authorView) {
+    public AuthorView listOfBooksByAuthor(AuthorWithoutBooks authorView) {
         AuthorEntity authorEntity = authorRepo.findAuthorEntityByFirstNameAndLastNameAndMiddleName(
                                                 authorView.getFirstName(),
                                                 authorView.getLastName(),
-                                                authorView.getMiddleName());
+                                                authorView.getMiddleName())
+                .orElseThrow(()-> new CustomRuntimeException("Автора нет в базе данных"));
         return mapperFactory.getMapperFacade().map(authorEntity, AuthorView.class);
     }
 
     @Override
     public AuthorView addAuthor(AuthorView authorView) {
-        AuthorEntity authorEntity = authorRepo.findAuthorEntityByFirstNameAndLastNameAndMiddleName(
-                authorView.getFirstName(),
-                authorView.getLastName(),
-                authorView.getMiddleName());
-        if (authorEntity == null) {
-            authorEntity = mapperFactory.getMapperFacade().map(authorView, AuthorEntity.class);
-        }
+        AuthorEntity authorEntity = authorRepo
+                .findAuthorEntityByFirstNameAndLastNameAndMiddleName(
+                                      authorView.getFirstName(),
+                                      authorView.getLastName(),
+                                      authorView.getMiddleName())
+                        .orElseGet(() -> mapperFactory.getMapperFacade()
+                        .map(authorView, AuthorEntity.class));
         authorEntity.setBooks(Sets.newHashSet(mapperFactory.getMapperFacade()
                 .mapAsList(authorView.getBooks(), BookEntity.class)));
-        AuthorEntity finalAuthorEntity = authorEntity;
-        authorEntity.getBooks().forEach(a->a.setAuthor(finalAuthorEntity));
+        authorEntity.getBooks().forEach(a->a.setAuthor(authorEntity));
         authorRepo.save(authorEntity);
         return mapperFactory.getMapperFacade().map(authorView, AuthorView.class);
     }
 
     @Override
     public void removeAuthor(AuthorWithoutBooks authorView) {
-        AuthorEntity authorEntity = authorRepo.findAuthorEntityByFirstNameAndLastNameAndMiddleName(
-                authorView.getFirstName(),
-                authorView.getLastName(),
-                authorView.getMiddleName());
-        if(authorEntity==null){
-            throw new DataNotFound("Автора");
-        }
+        AuthorEntity authorEntity = authorRepo
+              .findAuthorEntityByFirstNameAndLastNameAndMiddleName(
+              authorView.getFirstName(),
+              authorView.getLastName(),
+              authorView.getMiddleName())
+              .orElseThrow(()->
+        new DataNotFoundException("Не найдена информация по данному Автору"));
+
         if(!authorEntity.getBooks().isEmpty()) {
             authorEntity.getBooks().forEach(a -> {
-    if(a.getPersons()!=null) {
-        throw new MyCustomException(
-                String.format("Книга %s данного автора находится у человека",
-                        a.getName()));
+        if(!a.getPersons().isEmpty()) {
+        throw new CustomRuntimeException(
+               "Книга "+a.getName()+" данного автора находится у человека");
                 }
             });
 

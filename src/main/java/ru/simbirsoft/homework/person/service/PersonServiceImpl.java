@@ -7,10 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.simbirsoft.homework.book.model.BookEntity;
 import ru.simbirsoft.homework.book.repository.BookRepo;
 import ru.simbirsoft.homework.book.view.BookView;
-import ru.simbirsoft.homework.exception.DataNotFound;
-import ru.simbirsoft.homework.exception.MyCustomException;
+import ru.simbirsoft.homework.exception.CustomRuntimeException;
+import ru.simbirsoft.homework.exception.DataNotFoundException;
 import ru.simbirsoft.homework.librarycard.model.LibraryCard;
-import ru.simbirsoft.homework.librarycard.repository.LibraryRepo;
 import ru.simbirsoft.homework.mapper.MyCustomMapperForPerson;
 import ru.simbirsoft.homework.person.model.PersonEntity;
 import ru.simbirsoft.homework.person.repository.PersonRepo;
@@ -21,7 +20,6 @@ import ru.simbirsoft.homework.person.view.PersonViewWithoutDateAndBooks;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -32,7 +30,6 @@ public class PersonServiceImpl implements PersonService{
     private final PersonRepo personRepo;
     private final MapperFactory mapperFactory;
     private final BookRepo bookRepo;
-    private final LibraryRepo libraryRepo;
 
 
     @Override
@@ -46,12 +43,12 @@ public class PersonServiceImpl implements PersonService{
 
     @Override
     public List<BookView> getPersonsBooks(Integer id) {
-        Optional<PersonEntity> personEntityOptional = personRepo.findById(id);
-       if(!personEntityOptional.isPresent()){
-           throw new DataNotFound(String.format("Человека с ID %d",id));
-       }
-        Set<LibraryCard> libraryCard = personEntityOptional.get().getBooks();
-       Set<BookEntity> books = new HashSet<>();
+        PersonEntity personEntity = personRepo
+                .findById(id)
+                .orElseThrow(()->
+                        new DataNotFoundException("Человека с ID "+id));
+        Set<LibraryCard> libraryCard = personEntity.getBooks();
+        Set<BookEntity> books = new HashSet<>();
         libraryCard.forEach(a->books.add(a.getBook()));
         return mapperFactory.getMapperFacade()
                 .mapAsList(books,BookView.class);
@@ -66,11 +63,12 @@ public class PersonServiceImpl implements PersonService{
 
     @Override
     public PersonViewWithoutBooks editPerson(Integer id, PersonViewWithoutBooks personView) {
-        Optional<PersonEntity> personEntityOptional = personRepo.findById(id);
-        if(!personEntityOptional.isPresent()){
-            throw new DataNotFound(String.format("Человека с ID %d",id));
-        }
-       PersonEntity personEntity = personEntityOptional.get();
+        PersonEntity personEntity = personRepo
+                .findById(id)
+                .orElseThrow(()->
+                        new DataNotFoundException(
+                                "Не найдена информация по Человеку с ID "+id));
+
         personEntity.setFirstName(personView.getFirstName());
         personEntity.setLastName(personView.getLastName());
         if(personView.getBirthDate()!=null) {
@@ -86,13 +84,13 @@ public class PersonServiceImpl implements PersonService{
 
     @Override
     public void removePerson(Integer id) {
-        Optional<PersonEntity> personEntityOptional = personRepo.findById(id);
-        if(!personEntityOptional.isPresent()){
-            throw new DataNotFound(String.format("Человека с ID %d",id));
-        }
-        PersonEntity personEntity = personEntityOptional.get();
+        PersonEntity personEntity = personRepo
+                .findById(id)
+                .orElseThrow(()->
+                        new DataNotFoundException(
+                                "Не найдена информация по Человеку с ID "+id));
         if(!personEntity.getBooks().isEmpty()){
-            throw new MyCustomException("Пользователь не может быть удален, " +
+            throw new CustomRuntimeException("Пользователь не может быть удален, " +
                     "пока не вернет книги");
         }
         personRepo.delete(personEntity);
@@ -100,22 +98,22 @@ public class PersonServiceImpl implements PersonService{
 
     @Override
     public void removePerson(PersonViewWithoutDateAndBooks personView) {
-        List<PersonEntity> personEntityOptional =
+        List<PersonEntity> personEntity =
                 personRepo.findAllPersonEntityByFirstNameAndLastNameAndMiddleName(
                         personView.getFirstName(),
                         personView.getLastName(),
                         personView.getMiddleName());
-    if(personEntityOptional.isEmpty()){
-    throw new DataNotFound(String.format("ФИО %s %s %s",
+    if(personEntity.isEmpty()){
+    throw new DataNotFoundException(String.format("Человека %s %s %s нет в базе данных",
             personView.getFirstName(),
             personView.getLastName(),
             personView.getMiddleName()));
     }
-    personEntityOptional.forEach(a-> {
+    personEntity.forEach(a-> {
                 if (!a.getBooks().isEmpty()) {
-                    throw new MyCustomException(String.format("Пользователь " +
-                            "c ID %s не может быть удален, " +
-                            "пока не вернет книги", a.getPersonId()));
+                    throw new CustomRuntimeException("Пользователь " +
+                            "c ID" +a.getPersonId()+" не может быть удален, " +
+                            "пока не вернет книги");
                 }
                 personRepo.delete(a);
             }
@@ -124,24 +122,22 @@ public class PersonServiceImpl implements PersonService{
 
     @Override
     public PersonView borrowBook(Integer id, String name) {
-        Optional<PersonEntity> personEntityOptional = personRepo.findById(id);
-        BookEntity bookEntity = bookRepo.getByName(name);
-        if(!personEntityOptional.isPresent()){
-            throw new DataNotFound(String.format("Человека с ID %d",id));
-        }
-        if(bookEntity==null){
-            throw new DataNotFound(
-                    String.format("Книги с названием %s. Книги нет в библиотеке",
-                            name));
-        }
+        PersonEntity personEntity = personRepo.findById(id)
+                .orElseThrow(()->
+            new DataNotFoundException(
+                "Не найдена информация по Человеку с ID "+id));
+        BookEntity bookEntity = bookRepo.getByName(name)
+                .orElseThrow(()->
+                new DataNotFoundException(
+                "Книги с названием "+name+" нет в библиотеке"));
+
         if(!bookEntity.getPersons().isEmpty()){
-            throw new MyCustomException("Книга уже взята из библиотеки");
+            throw new CustomRuntimeException("Книга уже взята из библиотеки");
         }
-        PersonEntity personEntity = personEntityOptional.get();
         if(personEntity.getBooks().stream().anyMatch(a->
                 LocalDateTime.now().isAfter(a.getReturned()))){
-            throw new MyCustomException(String.format(
-                    "У Человека с ID %d есть просроченная книга",id));
+            throw new CustomRuntimeException(
+                    "У Человека с ID "+id+" есть просроченная книга");
         }
         personEntity.addBook(bookEntity);
         personRepo.flush();
@@ -154,23 +150,18 @@ public class PersonServiceImpl implements PersonService{
 
     @Override
     public PersonView returnBook(Integer id, String name) {
-        Optional<PersonEntity> personEntityOptional = personRepo.findById(id);
-        BookEntity bookEntity = bookRepo.getByName(name);
-        if(!personEntityOptional.isPresent()){
-            throw new DataNotFound(String.format("Человека с ID %d",id));
-        }
-        if(bookEntity==null){
-            throw new DataNotFound(
-                    String.format("Книги с названием %s. Книги нет в библиотеке",
-                            name));
-        }
+        PersonEntity personEntity = personRepo.findById(id).orElseThrow(()->
+                new DataNotFoundException(
+                        "Не найдена информация по Человеку с ID "+id));
+        BookEntity bookEntity = bookRepo.getByName(name).orElseThrow(()->
+                new DataNotFoundException(
+                        "Книги с названием "+name+" нет в библиотеке"));
         if(bookEntity.getPersons().isEmpty()){
-            throw new MyCustomException("Книга находится в библиотеке");
+            throw new CustomRuntimeException("Книга находится в библиотеке");
         }
-
-        PersonEntity personEntity = personEntityOptional.get();
-        if(personEntity.getBooks().stream().noneMatch(a->a.getBook().getName().equals(name))){
-            throw new MyCustomException(
+        if(personEntity.getBooks().stream()
+                .noneMatch(a->a.getBook().getName().equals(name))){
+            throw new CustomRuntimeException(
                     String.format("Книга '%s' не у человека c ID %d", name, id));
         }
         personEntity.removeBook(bookEntity);

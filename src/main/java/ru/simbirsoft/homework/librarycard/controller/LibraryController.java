@@ -18,7 +18,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 
-@Api(value = "LibraryController", description = "Управление жанрами книг")
+@Api(value = "LibraryController", description = "Управление записями о взятых книгах")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/library", produces = APPLICATION_JSON_VALUE)

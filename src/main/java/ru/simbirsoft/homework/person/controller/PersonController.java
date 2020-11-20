@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,42 +39,43 @@ public class PersonController {
       return ResponseEntity.ok(personView);
    }
 
-   @PostMapping("/edit")
-   @ApiOperation(value = "Изменить ифнормацию о человеке", httpMethod = "POST")
+   @PutMapping("/")
+   @ApiOperation(value = "Изменить ифнормацию о человеке", httpMethod = "PUT")
    public ResponseEntity<PersonViewWithoutBooks> editPerson(
            @RequestParam Integer id,
            @Valid @RequestBody PersonViewWithoutBooks personView){
       return ResponseEntity.ok(personService.editPerson(id,personView));
    }
 
-   @DeleteMapping("/remove_by_id")
+   @DeleteMapping("/{id}")
    @ApiOperation(value = "Удалить человека из списка по ID", httpMethod = "DELETE")
-   public ResponseEntity<String> removePerson(@RequestParam Integer id) {
+   public ResponseEntity<String> removePerson(@PathVariable Integer id) {
       personService.removePerson(id);
       return ResponseEntity.ok("OK");
    }
 
-   @DeleteMapping("/remove_by_name")
+   @DeleteMapping("/")
    @ApiOperation(value = "Удалить человека из списка по ФИО", httpMethod = "DELETE")
-   public ResponseEntity<String> removePerson(@Valid @RequestBody PersonViewWithoutDateAndBooks personView) {
+   public ResponseEntity<String> removePerson(
+           @Valid @RequestBody PersonViewWithoutDateAndBooks personView) {
       personService.removePerson(personView);
       return ResponseEntity.ok("OK");
    }
-   @GetMapping("/")
+   @GetMapping("/{id}")
    @ApiOperation(value = "Получить список книг человека", httpMethod = "GET")
-   public ResponseEntity<List<BookView>> getById(@RequestParam Integer id){
+   public ResponseEntity<List<BookView>> getById(@PathVariable Integer id){
       return ResponseEntity.ok(personService.getPersonsBooks(id));
    }
 
-   @PostMapping("/borrow")
-   @ApiOperation(value = "Добавить книгу в список книг человека", httpMethod = "POST")
+   @PutMapping("/borrow")
+   @ApiOperation(value = "Добавить книгу в список книг человека", httpMethod = "PUT")
    public ResponseEntity<PersonView> borrowBook(@RequestParam Integer personId,
                                                 @RequestParam String bookName){
       return ResponseEntity.ok(personService.borrowBook(personId,bookName));
    }
 
-   @PostMapping("/return")
-   @ApiOperation(value = "Убрать книгу из списка книг человека", httpMethod = "POST")
+   @PutMapping("/return")
+   @ApiOperation(value = "Убрать книгу из списка книг человека", httpMethod = "PUT")
    public ResponseEntity<PersonView> returnBook(@RequestParam Integer personId,
                                                  @RequestParam String bookName){
       return ResponseEntity.ok(personService.returnBook(personId,bookName));

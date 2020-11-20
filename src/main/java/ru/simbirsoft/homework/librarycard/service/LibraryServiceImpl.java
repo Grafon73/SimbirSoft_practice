@@ -5,7 +5,7 @@ import ma.glasnost.orika.MapperFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.simbirsoft.homework.book.repository.BookRepo;
-import ru.simbirsoft.homework.exception.MyCustomException;
+import ru.simbirsoft.homework.exception.CustomRuntimeException;
 import ru.simbirsoft.homework.librarycard.model.LibraryCard;
 import ru.simbirsoft.homework.librarycard.repository.LibraryRepo;
 import ru.simbirsoft.homework.librarycard.view.LibraryView;
@@ -36,17 +36,16 @@ public class LibraryServiceImpl implements LibraryService {
     @Override
     public LibraryView addDays(Integer bookId, Integer personId, Integer days) {
        if(!personRepo.findById(personId).isPresent()){
-           throw new MyCustomException(String.format("Человек с ID %d не найден",personId));
+           throw new CustomRuntimeException("Человек с ID "+personId+" не найден");
        }
         if(!bookRepo.findById(bookId).isPresent()){
-            throw new MyCustomException(String.format("Книга с ID %d не найдена",bookId));
+            throw new CustomRuntimeException("Книга с ID "+bookId+" не найдена");
         }
         LibraryCard libraryCard =
-                libraryRepo.findByBook_BookIdAndPerson_PersonId(bookId,personId);
-        if(libraryCard==null){
-            throw new MyCustomException(
-                    String.format("У человека с ID %d нет книги c ID %d",personId,bookId));
-        }
+                libraryRepo.findByBook_BookIdAndPerson_PersonId(bookId,personId)
+                        .orElseThrow(()->
+                        new CustomRuntimeException(
+                        "У человека с ID "+personId+" нет книги c ID "+bookId));
         libraryCard.addDays(days);
         libraryRepo.save(libraryCard);
         mapperFactory.classMap(LibraryCard.class, LibraryView.class)

@@ -1,17 +1,34 @@
 package ru.simbirsoft.homework.book.service;
 
-import ru.simbirsoft.homework.author.view.AuthorWithoutBooks;
 import ru.simbirsoft.homework.book.view.BookView;
 import ru.simbirsoft.homework.book.view.BookViewWithoutAuthor;
-import ru.simbirsoft.homework.genre.view.GenreView;
 
 import java.util.List;
 
 
 public interface BookService {
+
+    /**
+     * Добавить книгу
+     */
     BookView addBook(BookView bookView);
+
+    /**
+     * Удалить книгу
+     */
     void removeBook(Integer id);
+
+    /**
+     * Изменить жанр
+     */
     BookView editGenre(BookViewWithoutAuthor bookView);
-    List<BookView> getBooks(AuthorWithoutBooks authorView);
-    List<BookView> getBooks(GenreView genreView);
+
+    /**
+     * Список книг по автору
+     */
+    List<BookView> getBooksByAuthor(String firstName, String lastName, String middleName);
+    /**
+     * Список книг по жанру
+     */
+    List<BookView> getBooksByGenre(String name);
 }

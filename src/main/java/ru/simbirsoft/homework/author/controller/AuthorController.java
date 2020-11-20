@@ -43,13 +43,13 @@ public class AuthorController {
     @GetMapping("/")
     @ApiOperation(value = "Получить список авторов", httpMethod = "GET")
     public ResponseEntity<List<AuthorWithoutBooks>> getAllAuthors(){
-        return ResponseEntity.ok(authorService.all());
+        return ResponseEntity.ok(authorService.getAllAuthors());
     }
 
     @PostMapping("/")
     @ApiOperation(value = "Получить список книг автора", httpMethod = "POST")
     public ResponseEntity<AuthorView> getAuthorsBook(@Valid  @RequestBody AuthorWithoutBooks authorView){
-        return ResponseEntity.ok(authorService.listOfBooks(authorView));
+        return ResponseEntity.ok(authorService.listOfBooksByAuthor(authorView));
     }
 
 }

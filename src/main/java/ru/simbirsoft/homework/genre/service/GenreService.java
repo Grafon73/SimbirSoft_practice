@@ -12,7 +12,7 @@ public interface GenreService {
     /**
      * Получить все объекты Genre
      */
-    List<GenreView> all();
+    List<GenreView> getAllGenres();
 
 
     /**

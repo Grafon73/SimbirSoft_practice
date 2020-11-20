@@ -11,9 +11,9 @@ import java.util.Map;
 
 @ControllerAdvice
 public class MyExceptionHandler extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(MyCustomException.class)
+    @ExceptionHandler(CustomRuntimeException.class)
     public ResponseEntity<Object> handleBookBorrowedException(
-            MyCustomException ex) {
+            CustomRuntimeException ex) {
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("error", ex.getMessage());
@@ -21,9 +21,9 @@ public class MyExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DataNotFound.class)
+    @ExceptionHandler(DataNotFoundException.class)
     public ResponseEntity<Object> handleDataNotFoundException(
-            DataNotFound ex) {
+            DataNotFoundException ex) {
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("error", ex.getMessage());

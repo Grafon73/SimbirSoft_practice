@@ -38,7 +38,7 @@ public class GenreController {
     @GetMapping("/")
     @ApiOperation(value = "Список жанров", httpMethod = "GET")
     public ResponseEntity<List<GenreView>> getAll(){
-        List<GenreView> genreViewList = genreService.all();
+        List<GenreView> genreViewList = genreService.getAllGenres();
         return ResponseEntity.ok(genreViewList);
     }
 
@@ -52,7 +52,7 @@ public class GenreController {
     @ApiOperation(value = "Удалить жанр", httpMethod = "DELETE")
     public ResponseEntity<List<GenreView>> removeGenre(@RequestParam String name){
         genreService.remove(name);
-        List<GenreView> genreViewList = genreService.all();
+        List<GenreView> genreViewList = genreService.getAllGenres();
         return ResponseEntity.ok(genreViewList);
     }
 }

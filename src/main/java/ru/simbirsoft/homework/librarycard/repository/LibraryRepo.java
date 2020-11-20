@@ -5,9 +5,10 @@ import org.springframework.data.jpa.repository.Query;
 import ru.simbirsoft.homework.librarycard.model.LibraryCard;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LibraryRepo  extends JpaRepository<LibraryCard,Integer> {
     @Query("SELECT l FROM LibraryCard l WHERE current_date>l.returned")
     List<LibraryCard> getAllDebt();
-    LibraryCard findByBook_BookIdAndPerson_PersonId(Integer bookId,Integer personId);
+    Optional<LibraryCard> findByBook_BookIdAndPerson_PersonId(Integer bookId, Integer personId);
 }
