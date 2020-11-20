@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +44,7 @@ public class BookController {
         return  ResponseEntity.ok("OK");
     }
 
-    @GetMapping("/author")
+    @GetMapping("/")
     @ApiOperation(value = "Получить список всех книг по автору", httpMethod = "GET")
     public ResponseEntity<List<BookView>> getBooksByAuthor(
             @RequestParam(required = false) String firstName,
@@ -52,9 +53,9 @@ public class BookController {
         return ResponseEntity.ok(bookService.getBooksByAuthor(firstName,lastName,middleName));
     }
 
-    @GetMapping("/genre")
+    @GetMapping("/{name}")
     @ApiOperation(value = "Получить список всех книг по жанру", httpMethod = "GET")
-    public ResponseEntity<List<BookView>> getBooksByGenre(@RequestParam String name) {
+    public ResponseEntity<List<BookView>> getBooksByGenre(@PathVariable String name) {
         return ResponseEntity.ok(bookService.getBooksByGenre(name));
     }
 

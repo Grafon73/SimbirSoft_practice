@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,15 +29,15 @@ public class AuthorController {
 
     private final AuthorService authorService;
 
-    @PostMapping("/author")
+    @PostMapping("/")
     @ApiOperation(value = "Добавить автора в список", httpMethod = "POST")
     public ResponseEntity<AuthorView> addAuthor(@Valid  @RequestBody AuthorView authorView){
           return ResponseEntity.ok(authorService.addAuthor(authorView));
     }
-    @DeleteMapping("/author")
+    @DeleteMapping("/{id}")
     @ApiOperation(value = "Удалить автора из списка", httpMethod = "DELETE")
-    public ResponseEntity<String> removeAuthor(@Valid  @RequestBody AuthorWithoutBooks authorView){
-        authorService.removeAuthor(authorView);
+    public ResponseEntity<String> removeAuthor(@PathVariable Integer id){
+        authorService.removeAuthor(id);
         return ResponseEntity.ok("OK");
     }
 
@@ -46,10 +47,10 @@ public class AuthorController {
         return ResponseEntity.ok(authorService.getAllAuthors());
     }
 
-    @PostMapping("/")
-    @ApiOperation(value = "Получить список книг автора", httpMethod = "POST")
-    public ResponseEntity<AuthorView> getAuthorsBook(@Valid  @RequestBody AuthorWithoutBooks authorView){
-        return ResponseEntity.ok(authorService.listOfBooksByAuthor(authorView));
+    @GetMapping("/{id}")
+    @ApiOperation(value = "Получить список книг автора", httpMethod = "GET")
+    public ResponseEntity<AuthorView> getAuthorsBook(@PathVariable Integer id){
+        return ResponseEntity.ok(authorService.listOfBooksByAuthor(id));
     }
 
 }

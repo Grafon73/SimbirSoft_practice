@@ -126,7 +126,7 @@ public class PersonServiceImpl implements PersonService{
                 .orElseThrow(()->
             new DataNotFoundException(
                 "Не найдена информация по Человеку с ID "+id));
-        BookEntity bookEntity = bookRepo.getByName(name)
+        BookEntity bookEntity = bookRepo.findByName(name)
                 .orElseThrow(()->
                 new DataNotFoundException(
                 "Книги с названием "+name+" нет в библиотеке"));
@@ -153,7 +153,7 @@ public class PersonServiceImpl implements PersonService{
         PersonEntity personEntity = personRepo.findById(id).orElseThrow(()->
                 new DataNotFoundException(
                         "Не найдена информация по Человеку с ID "+id));
-        BookEntity bookEntity = bookRepo.getByName(name).orElseThrow(()->
+        BookEntity bookEntity = bookRepo.findByName(name).orElseThrow(()->
                 new DataNotFoundException(
                         "Книги с названием "+name+" нет в библиотеке"));
         if(bookEntity.getPersons().isEmpty()){

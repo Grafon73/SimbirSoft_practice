@@ -1,5 +1,6 @@
 package ru.simbirsoft.homework.mapper;
 
+import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -12,12 +13,10 @@ import ru.simbirsoft.homework.person.view.PersonView;
 import java.util.HashSet;
 import java.util.Set;
 
+@RequiredArgsConstructor
 public class MyCustomMapperForPerson extends CustomMapper<PersonEntity, PersonView> {
 
     private final MapperFactory mapperFactory;
-    public MyCustomMapperForPerson(MapperFactory mapperFactory) {
-        this.mapperFactory = mapperFactory;
-    }
 
     @Override
     public void mapAtoB(PersonEntity personEntity,

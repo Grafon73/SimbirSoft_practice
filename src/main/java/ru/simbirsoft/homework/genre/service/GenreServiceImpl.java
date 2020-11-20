@@ -40,7 +40,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public Integer stats(String name) {
+    public Integer getBooksCountByGenre(String name) {
         return genreRepo.countAllBooksByGenre(name);
     }
 

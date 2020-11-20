@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface BookRepo extends JpaRepository<BookEntity,Integer> {
     List<BookEntity> getAllByAuthor_FirstNameOrAuthor_LastNameOrAuthor_MiddleName(String firstName, String lastName, String middleName);
     List<BookEntity> getAllByGenres_Name(String genre);
-    Optional<BookEntity> getByName(String name);
+    Optional<BookEntity> findByName(String name);
 }

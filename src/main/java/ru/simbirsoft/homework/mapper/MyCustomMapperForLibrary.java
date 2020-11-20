@@ -1,5 +1,6 @@
 package ru.simbirsoft.homework.mapper;
 
+import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
@@ -11,14 +12,12 @@ import ru.simbirsoft.homework.person.view.PersonViewWithoutBooks;
 import java.time.LocalDateTime;
 import java.time.Period;
 
+@RequiredArgsConstructor
 public class MyCustomMapperForLibrary extends CustomMapper<LibraryCard, LibraryView> {
 
     private final MapperFactory mapperFactory;
 
-    public MyCustomMapperForLibrary(MapperFactory mapperFactory) {
-        this.mapperFactory = mapperFactory;
-    }
-
+    @Override
     public void mapAtoB(LibraryCard libraryCard,
                         LibraryView libraryView,
                         MappingContext context) {

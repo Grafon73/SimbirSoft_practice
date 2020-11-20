@@ -15,7 +15,7 @@ public interface AuthorService {
     /**
      * Список книг автора
      */
-    AuthorView listOfBooksByAuthor(AuthorWithoutBooks authorView);
+    AuthorView listOfBooksByAuthor(Integer id);
 
     /**
      * Добавить автора
@@ -25,5 +25,5 @@ public interface AuthorService {
     /**
      * Удалить автора
      */
-    void removeAuthor(AuthorWithoutBooks authorView);
+    void removeAuthor(Integer id);
 }

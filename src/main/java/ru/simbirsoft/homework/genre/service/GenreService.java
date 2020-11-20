@@ -23,7 +23,7 @@ public interface GenreService {
     /**
      * Получить количество книг по Genre
      */
-    Integer stats(String name);
+    Integer getBooksCountByGenre(String name);
 
     /**
      * Удалить Genre

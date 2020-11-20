@@ -29,11 +29,8 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public AuthorView listOfBooksByAuthor(AuthorWithoutBooks authorView) {
-        AuthorEntity authorEntity = authorRepo.findAuthorEntityByFirstNameAndLastNameAndMiddleName(
-                                                authorView.getFirstName(),
-                                                authorView.getLastName(),
-                                                authorView.getMiddleName())
+    public AuthorView listOfBooksByAuthor(Integer id) {
+        AuthorEntity authorEntity = authorRepo.findById(id)
                 .orElseThrow(()-> new CustomRuntimeException("Автора нет в базе данных"));
         return mapperFactory.getMapperFacade().map(authorEntity, AuthorView.class);
     }
@@ -55,12 +52,9 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public void removeAuthor(AuthorWithoutBooks authorView) {
+    public void removeAuthor(Integer id) {
         AuthorEntity authorEntity = authorRepo
-              .findAuthorEntityByFirstNameAndLastNameAndMiddleName(
-              authorView.getFirstName(),
-              authorView.getLastName(),
-              authorView.getMiddleName())
+              .findById(id)
               .orElseThrow(()->
         new DataNotFoundException("Не найдена информация по данному Автору"));
 

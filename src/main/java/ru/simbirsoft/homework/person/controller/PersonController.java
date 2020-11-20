@@ -81,7 +81,7 @@ public class PersonController {
       return ResponseEntity.ok(personService.returnBook(personId,bookName));
    }
 
-    @GetMapping("/all")
+    @GetMapping("/")
     @ApiOperation(value = "*ДЛЯ ТЕСТОВ* Получить список всех людей", httpMethod = "GET")
     public ResponseEntity<List<PersonView>> getAll(){
         return ResponseEntity.ok(personService.getAllPersons());
