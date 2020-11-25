@@ -18,6 +18,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -58,6 +59,12 @@ public class AuthorEntity {
      */
     @Column(name = "middle_name")
     private String middleName;
+
+    /**
+     * Время создания записи
+     */
+    @Column(name = "birth_date")
+    private Date birthDate;
 
     /**
      * Время создания записи

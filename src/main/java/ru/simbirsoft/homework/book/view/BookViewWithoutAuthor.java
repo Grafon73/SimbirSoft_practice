@@ -1,6 +1,5 @@
 package ru.simbirsoft.homework.book.view;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import ru.simbirsoft.homework.genre.view.GenreView;
@@ -20,14 +19,12 @@ public class BookViewWithoutAuthor {
      * Название книги
      */
     @NotNull(message = "Название не может быть пустым")
-    @JsonProperty("Название книги")
     private String name;
 
     /**
      * Жанры книги
      */
     @Valid
-    @JsonProperty("Жанры")
     private Set<GenreView> genres;
 
 }

@@ -1,7 +1,6 @@
 package ru.simbirsoft.homework.book.view;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import ru.simbirsoft.homework.author.view.AuthorWithoutBooks;
@@ -22,15 +21,18 @@ public class BookView {
      * Название книги
      */
     @NotNull(message = "Название не может быть пустым")
-    @JsonProperty("Название книги")
     private String name;
+
+    /**
+     * Название книги
+     */
+    private String publicated;
 
     /**
      * Жанры книги
      */
     @Valid
     @JsonIgnoreProperties({"bookList","author","genres"})
-    @JsonProperty("Жанры")
     private Set<GenreView> genres;
 
     /**
@@ -38,6 +40,5 @@ public class BookView {
      */
     @Valid
     @JsonIgnoreProperties({"genres","author","bookList"})
-    @JsonProperty("Автор")
     private AuthorWithoutBooks author;
 }

@@ -42,7 +42,7 @@ public class LibraryServiceImpl implements LibraryService {
             throw new CustomRuntimeException("Книга с ID "+bookId+" не найдена");
         }
         LibraryCard libraryCard =
-                libraryRepo.findByBook_BookIdAndPerson_PersonId(bookId,personId)
+                libraryRepo.findByBook_BookIdAndPerson_PersonIdAndInLibraryFalse(bookId,personId)
                         .orElseThrow(()->
                         new CustomRuntimeException(
                         "У человека с ID "+personId+" нет книги c ID "+bookId));

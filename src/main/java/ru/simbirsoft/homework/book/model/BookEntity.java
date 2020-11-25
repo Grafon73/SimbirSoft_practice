@@ -61,6 +61,18 @@ public class BookEntity {
     private String name;
 
     /**
+     * Дата поступления в бибилотеку
+     */
+    @Column(name = "admission_date")
+    private LocalDateTime admited;
+
+    /**
+     * Дата поблукации
+     */
+    @Column(name = "publication_date")
+    private LocalDateTime publicated;
+
+    /**
      * Время создания записи
      */
     @Column(name = "create_date",columnDefinition = "timestamp with time zone")
@@ -90,9 +102,7 @@ public class BookEntity {
     private AuthorEntity author;
 
     @OneToMany(
-            mappedBy = "book",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            mappedBy = "book"
     )
     private Set<LibraryCard> persons;
 

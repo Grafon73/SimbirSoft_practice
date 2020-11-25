@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Authors</h2>
+
+<table id="authorsList">
+
+</table>
+<br />
+<br />
+
+    <input id="author_firstName" placeholder="Author First Name">
+    <input id="author_lasName" placeholder="Author Last Name">
+    <input id="author_middleName" placeholder="Author Middle Name">
+    <input type=date id="author_birthDate" placeholder="Author Birth Date">
+    <button id="add_author" onclick="createAuthor()">Create Author</button>
+    <label id="add_error" for="add_author">Добавить автора</label>
+    <form id="formBooks">Книги:
+    </form>
+    <button onclick="addBooks()" id="btn" type="button">Добавить книги</button>
+
+<br />
+<br />
+<br />
+<input id="delete_by_id">
+<button onclick="deleteAuthor()">Delete by ID</button>
+<label id="error" for="delete_by_id">Удалить автора по ID</label>
+<br />
+<br />
+<input id="load_by_id">
+<button onclick="loadById()">Load By ID</button>
+<label id="load_by_id_message" for="load_by_id">Получить список книг автора</label>
+
+<br />
+<br />
+
+<input id="find_author_firstName" placeholder="Author First Name">
+<input id="find_author_lasName" placeholder="Author Last Name">
+<input id="find_author_middleName" placeholder="Author Middle Name">
+<input type=date id="find_author_birthDate_from" placeholder="Author Birth Date From">
+<input type=date id="find_author_birthDate_to" placeholder="Author Birth Date TO">
+<button id="find_author" onclick="findByFIO()">Find Authors</button>
+<label id="find_error" for="find_author">Найти авторов</label>
+
+<br />
+<br />
+<h1 id="authorName"></h1>
+
+<table id="bookList">
+
+</table>
+<script>
+       function deleteAuthor() {
+           var id = document.getElementById("delete_by_id").value;
+           var xhttp = new XMLHttpRequest();
+
+           xhttp.open("DELETE", "http://localhost:8888/authors/" + id, true);
+           xhttp.send();
+           xhttp.onreadystatechange = function () {
+               if (this.status == 403) {
+                   document.getElementById("error").innerHTML = "Вам не разрешено данное действие";
+               } else {
+                   document.getElementById("error").innerHTML = this.responseText;
+               }
+               xhttp.onload = function () {
+                   loadAuthors();
+               }
+
+           }
+       }
+
+           function createAuthor() {
+               var firstName = document.getElementById("author_firstName").value;
+               var lastName = document.getElementById("author_lasName").value;
+               var middleName = document.getElementById("author_middleName").value;
+               var birthDate = document.getElementById("author_birthDate").value;
+
+               var xmlhttp = new XMLHttpRequest();
+               xmlhttp.open("POST", "http://localhost:8888/authors/");
+               xmlhttp.setRequestHeader("Content-Type", "application/json");
+
+               var books = [];
+               var bookJson;
+               var genresJson = [];
+               for (var i = 1; i <= bookCounter; i++) {
+                   var genres = document.getElementById("genre-" + i).value.toString();
+                   var listOfgenres = genres.split(",");
+                   for (var j = 0; j < listOfgenres.length; j++) {
+                       var genreJson = {name: listOfgenres[j]}
+                       genresJson.push(genreJson);
+                   }
+                   bookJson = {name: document.getElementById("book-" + i).value, genres: genresJson};
+                   books.push(bookJson);
+                   genresJson = [];
+               }
+               var json = JSON.stringify({
+                   firstName: firstName,
+                   lastName: lastName,
+                   middleName: middleName,
+                   birthDate: birthDate,
+                   books: books
+               });
+               console.log(json);
+               xmlhttp.send(json);
+
+               xmlhttp.onreadystatechange = function () {
+                   if (this.readyState == 4 && this.status == 200) {
+                       var author = JSON.parse(this.responseText);
+                       document.getElementById("authorName").innerHTML = author.firstName + " "
+                           + author.lastName + " " + author.middleName;
+                       var html = '<tr>\n' +
+                           '        <th>Book Name</th>\n' +
+                           '        <th>Genre Name</th>\n' +
+                           '    </tr>';
+                       for (var i = 0; i < author.books.length; i++) {
+                           var book = author.books[i];
+                           console.log(book);
+                           genreNames = "";
+                           for (var j = 0; j < book.genres.length; j++) {
+                               var genre = book.genres[j];
+                               console.log(genre);
+                               genreNames = genreNames + genre.name + " ";
+                           }
+                           html = html +
+                               '        <td>' + book.name + '</td>\n' +
+                               '        <td>' + genreNames + '</td></tr>\n';
+
+                       }
+                       document.getElementById("bookList").innerHTML = html;
+                   }
+               }
+               xmlhttp.onload = function () {
+                   if (this.readyState == 4 && this.status == 200) {
+                       document.getElementById("add_error").innerHTML = "OK";
+                       loadAuthors();
+                   } else if (this.status == 403) {
+                       document.getElementById("add_error").innerHTML = "Вам не разрешено данное действие";
+                   } else {
+                       document.getElementById("add_error").innerHTML = xmlhttp.responseText;
+                   }
+               }
+           }
+
+           function loadAuthors() {
+               var xhttp = new XMLHttpRequest();
+               xhttp.onreadystatechange = function () {
+                   if (this.readyState == 4 && this.status == 200) {
+                       var users = JSON.parse(this.responseText);
+                       var html = '<tr>\n' +
+                           '        <th>Author Name</th>\n' +
+                           '        <th>Author Last Name</th>\n' +
+                           '        <th>Author Middle Name</th>\n' +
+                           '        <th>Author Birth Date</th>\n' +
+                           '    </tr>';
+                       for (var i = 0; i < users.length; i++) {
+                           var author = users[i];
+                           console.log(author);
+                           html = html +
+                               '        <td>' + author.firstName + '</td>\n' +
+                               '        <td>' + author.lastName + '</td>\n' +
+                               '        <td>' + author.middleName + '</td>' +
+                               '        <td>' + author.birthDate + '</td></tr>';
+
+                       }
+                       document.getElementById("authorsList").innerHTML = html;
+                   }
+               };
+               xhttp.open("GET", "http://localhost:8888/authors/", true);
+               xhttp.send();
+           }
+
+           function loadById() {
+               var id = document.getElementById("load_by_id").value;
+               if (isNaN(id)) {
+                   document.getElementById("authorName").innerHTML = "Введите корректный ID";
+               } else {
+                   var xhttp = new XMLHttpRequest();
+                   xhttp.onreadystatechange = function () {
+                       if (this.readyState == 4 && this.status == 200) {
+                           var author = JSON.parse(this.responseText);
+                           document.getElementById("authorName").innerHTML = author.firstName + " "
+                               + author.lastName + " " + author.middleName;
+                           var html = '<tr>\n' +
+                               '        <th>Book Name</th>\n' +
+                               '        <th>Genre Name</th>\n' +
+                               '    </tr>';
+                           for (var i = 0; i < author.books.length; i++) {
+                               var book = author.books[i];
+                               console.log(book);
+                               genreNames = "";
+                               for (var j = 0; j < book.genres.length; j++) {
+                                   var genre = book.genres[j];
+                                   console.log(genre);
+                                   genreNames = genreNames + genre.name + " ";
+                               }
+                               html = html +
+                                   '        <td>' + book.name + '</td>\n' +
+                                   '        <td>' + genreNames + '</td></tr>\n';
+
+                           }
+                           document.getElementById("bookList").innerHTML = html;
+                       } else {
+                           document.getElementById("authorName").innerHTML = xhttp.responseText;
+                           document.getElementById("bookList").innerHTML = "";
+                       }
+                   };
+                   xhttp.open("GET", "http://localhost:8888/authors/" + id, true);
+                   xhttp.send();
+                   xhttp.onload = function () {
+                       loadAuthors();
+                   }
+               }
+           }
+
+           function findByFIO() {
+
+               var firstName = document.getElementById("find_author_firstName").value;
+               var lastName = document.getElementById("find_author_lasName").value;
+               var middleName = document.getElementById("find_author_middleName").value;
+               var birthDateFrom = document.getElementById("find_author_birthDate_from").value;
+               var birthDateTo = document.getElementById("find_author_birthDate_to").value;
+               var requset = "http://localhost:8888/authors/filter?";
+               if (firstName) {
+                   requset = requset + "firstName=" + firstName + "&";
+               }
+               if (lastName) {
+                   requset = requset + "lastName=" + lastName + "&";
+               }
+               if (middleName) {
+                   requset = requset + "middleName=" + middleName + "&";
+               }
+               if (birthDateFrom) {
+                   requset = requset + "from=" + birthDateFrom + "&";
+               }
+               if (birthDateTo) {
+                   requset = requset + "to=" + birthDateTo;
+               }
+
+               var xhttp = new XMLHttpRequest();
+               xhttp.onreadystatechange = function () {
+                   if (this.readyState == 4 && this.status == 200) {
+                       var users = JSON.parse(this.responseText);
+                       var html = '<tr>\n' +
+                           '        <th>Author Name</th>\n' +
+                           '        <th>Author Last Name</th>\n' +
+                           '        <th>Author Middle Name</th>\n' +
+                           '        <th>Author Birth Date</th>\n' +
+                           '    </tr>';
+                       for (var i = 0; i < users.length; i++) {
+                           var author = users[i];
+                           console.log(author);
+                           html = html +
+                               '        <td>' + author.firstName + '</td>\n' +
+                               '        <td>' + author.lastName + '</td>\n' +
+                               '        <td>' + author.middleName + '</td>' +
+                               '        <td>' + author.birthDate + '</td></tr>';
+
+                       }
+                       document.getElementById("bookList").innerHTML = html;
+                   }
+               };
+               xhttp.open("GET", requset, true);
+               xhttp.send();
+
+           }
+
+           var bookCounter = 0;
+
+           function addBooks() {
+               var genresCounter = 0;
+               var myForm = document.getElementById("formBooks");
+               bookCounter++;
+               var br = document.createElement("br");
+               myForm.appendChild(br)
+               var book = document.createElement("input");
+               book.id = 'book-' + bookCounter;
+               book.type = 'text';
+               book.placeholder = 'Книга № ' + bookCounter;
+               myForm.appendChild(book);
+
+               var genres = document.createElement("input");
+               genres.id = 'genre-' + bookCounter;
+               genres.type = 'text';
+               genres.placeholder = 'Жанры, через запятую ';
+               myForm.appendChild(genres);
+           }
+
+           loadAuthors();
+
+</script>
+
+</body>
+</html>

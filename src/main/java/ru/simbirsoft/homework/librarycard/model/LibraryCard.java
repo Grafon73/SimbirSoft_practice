@@ -8,17 +8,17 @@ import ru.simbirsoft.homework.book.model.BookEntity;
 import ru.simbirsoft.homework.person.model.PersonEntity;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -28,19 +28,18 @@ import java.util.Objects;
 @Table(name = "library_card")
 public class LibraryCard {
 
-    @EmbeddedId
-    private LibraryCardId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "card_id")
+    private Integer cardId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("bookId")
     private BookEntity book;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("personId")
     private PersonEntity person;
 
     public LibraryCard(BookEntity book, PersonEntity person) {
-        this.id = new LibraryCardId(book.getBookId(),person.getPersonId());
         this.book = book;
         this.person = person;
     }
@@ -69,6 +68,12 @@ public class LibraryCard {
     @Column(name = "update_date",columnDefinition = "timestamp with time zone")
     private LocalDateTime updated;
 
+    /**
+     * Находится ли книга в библиотеке
+     */
+    @Column(name = "in_library")
+    private boolean inLibrary;
+
 
     @PrePersist
     protected void onCreate() {
@@ -85,17 +90,8 @@ public class LibraryCard {
        returned= returned.plusDays(days);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LibraryCard that = (LibraryCard) o;
-        return Objects.equals(book, that.book) &&
-                Objects.equals(person, that.person);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(book, person);
+    public void setInLibrary(boolean inLibrary) {
+        returned = LocalDateTime.now();
+        this.inLibrary = inLibrary;
     }
 }

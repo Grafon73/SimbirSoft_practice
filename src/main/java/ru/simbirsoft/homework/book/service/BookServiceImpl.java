@@ -1,7 +1,7 @@
 package ru.simbirsoft.homework.book.service;
 
 
-import com.google.common.collect.Sets;
+
 import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
 import org.springframework.data.domain.Example;
@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.simbirsoft.homework.author.model.AuthorEntity;
 import ru.simbirsoft.homework.author.repository.AuthorRepo;
 import ru.simbirsoft.homework.book.model.BookEntity;
+import ru.simbirsoft.homework.book.repository.Attribute;
 import ru.simbirsoft.homework.book.repository.BookRepo;
+import ru.simbirsoft.homework.book.repository.CustomBookRepo;
 import ru.simbirsoft.homework.book.view.BookView;
 import ru.simbirsoft.homework.book.view.BookViewWithoutAuthor;
 import ru.simbirsoft.homework.exception.CustomRuntimeException;
@@ -20,6 +22,7 @@ import ru.simbirsoft.homework.genre.model.GenreEntity;
 import ru.simbirsoft.homework.genre.repository.GenreRepo;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +35,7 @@ public class BookServiceImpl implements BookService {
     private final MapperFactory mapperFactory;
     private final GenreRepo genreRepo;
     private final AuthorRepo authorRepo;
+    private final CustomBookRepo customBookRepo;
 
 
     @Override
@@ -67,7 +71,7 @@ public class BookServiceImpl implements BookService {
                       new DataNotFoundException("Книги c названием "
                               +bookView.getName()+" нет в базе"));
 
-      Set<GenreEntity> newGenres = Sets.newHashSet(mapperFactory
+      Set<GenreEntity> newGenres = new HashSet<>(mapperFactory
               .getMapperFacade().mapAsList(bookView.getGenres(),GenreEntity.class));
       bookEntity.setGenres(newGenres);
       genreRepo.removeAllByBooksIsNull();
@@ -101,5 +105,15 @@ public class BookServiceImpl implements BookService {
     public List<BookView> getBooksByGenre(String name) {
         List <BookEntity> bookEntities = bookRepo.getAllByGenres_Name(name);
         return mapperFactory.getMapperFacade().mapAsList(bookEntities,BookView.class);
+    }
+
+    @Override
+    public List<BookView> getBooksByGenreAndDate(String genre,
+                                                 Integer year,
+                                                 Attribute attribute) {
+        return mapperFactory.getMapperFacade()
+                .mapAsList(customBookRepo
+                                .findByGenreAndDate(genre, year, attribute),
+                        BookView.class);
     }
 }

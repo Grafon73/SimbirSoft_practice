@@ -3,6 +3,7 @@ package ru.simbirsoft.homework.author.service;
 import ru.simbirsoft.homework.author.view.AuthorView;
 import ru.simbirsoft.homework.author.view.AuthorWithoutBooks;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -26,4 +27,14 @@ public interface AuthorService {
      * Удалить автора
      */
     void removeAuthor(Integer id);
+
+    /**
+     * Список авторов по ФИО и дате рождения
+     */
+    List<AuthorWithoutBooks> getAuthorsByBirthDateAndFIO(String firstName,
+                                                         String lastName,
+                                                         String middleName,
+                                                         Date from,
+                                                         Date to);
+
 }
