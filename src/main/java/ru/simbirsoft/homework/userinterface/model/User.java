@@ -1,8 +1,9 @@
-package ru.simbirsoft.homework.authorization.model;
+package ru.simbirsoft.homework.userinterface.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.simbirsoft.homework.person.model.PersonEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -25,5 +26,7 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private Role role;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    private PersonEntity personEntity;
 }
 

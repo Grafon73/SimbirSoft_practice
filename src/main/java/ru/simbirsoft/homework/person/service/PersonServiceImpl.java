@@ -49,7 +49,7 @@ public class PersonServiceImpl implements PersonService{
         PersonEntity personEntity = personRepo
                 .findById(id)
                 .orElseThrow(()->
-                        new DataNotFoundException("Человека с ID "+id));
+                        new DataNotFoundException("Не найден человек с ID "+id));
         Set<LibraryCard> libraryCard = personEntity.getBooks()
                 .stream()
                 .filter(a->!a.isInLibrary())

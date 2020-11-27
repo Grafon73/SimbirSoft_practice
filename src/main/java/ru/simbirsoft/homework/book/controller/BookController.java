@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,12 +35,14 @@ public class BookController {
     private final BookService bookService;
 
     @PostMapping("/")
+    @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Добавить книгу в список", httpMethod = "POST")
     public ResponseEntity<BookView> addBook(@Valid @RequestBody BookView bookView) {
         return ResponseEntity.ok(bookService.addBook(bookView));
     }
 
     @DeleteMapping("/")
+    @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Удалить книгу из списка", httpMethod = "DELETE")
     public ResponseEntity<String> removeBook(@RequestParam Integer id) {
         bookService.removeBook(id);
@@ -63,6 +66,7 @@ public class BookController {
 
 
     @PutMapping("/")
+    @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Изменить жанр книги", httpMethod = "PUT")
     public ResponseEntity<BookView> editGenre(@Valid @RequestBody BookViewWithoutAuthor bookView) {
         return ResponseEntity.ok(bookService.editGenre(bookView));

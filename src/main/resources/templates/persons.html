@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Persons</h2>
+
+
+<table id="personsList">
+
+</table>
+<br />
+<br />
+<input id="edit_person_id" placeholder="Author ID">
+<input id="edit_person_firstName" placeholder="Person First Name">
+<input id="edit_person_lasName" placeholder="Person Last Name">
+<input id="edit_person_middleName" placeholder="Person Middle Name">
+<input type=date id="edit_person_birthDate" placeholder="Person Birth Date">
+<button id="edit_author" onclick="editPerson()">Edit Person</button>
+<label id="edit_error" for="edit_author">Изменить данные человека</label>
+
+<br />
+<br />
+
+<input id="person_firstName" placeholder="Person First Name">
+<input id="person_lasName" placeholder="Person Last Name">
+<input id="person_middleName" placeholder="Person Middle Name">
+<input type=date id="person_birthDate" placeholder="Person Birth Date">
+<button id="add_person" onclick="createPerson()">Create Person</button>
+<label id="add_error" for="add_person">Добавить человека</label>
+
+
+<br />
+<br />
+<input id="delete_byFIO_person_firstName" placeholder="Person First Name">
+<input id="delete_byFIO_person_lasName" placeholder="Person Last Name">
+<input id="delete_byFIO_person_middleName" placeholder="Person Middle Name">
+<button id="delete_by_fio" onclick="deleteByFIO()">Delete by FIO</button>
+<label id="delete_by_fio_error" for="delete_by_fio">Удалить автора по ФИО</label>
+<br />
+<br />
+<input id="delete_by_id">
+<button onclick="deleteById()">Delete by ID</button>
+<label id="error" for="delete_by_id">Удалить человка по ID</label>
+<br />
+<br />
+<input id="load_by_id">
+<button onclick="loadById()">Load By ID</button>
+<label id="load_by_id_message" for="load_by_id">Получить список взятых книг человека</label>
+
+<br />
+<br />
+
+<input id="person_id" placeholder="Person ID">
+<input id="book_name" placeholder="Book Name">
+<br />
+<button id="borrow" onclick="borrowBook()">Borrow Book</button>
+<label id="borrow_error" for="borrow">Взять книгу</label>
+<br />
+<button id="return" onclick="returnBook()">Return Book</button>
+<label id="return_error" for="return">Вернуть книгу</label>
+
+<br />
+<br />
+<h1 id="InfoField"></h1>
+
+<table id="personList">
+
+</table>
+<script>
+    function deleteByFIO(){
+        var firstName = document.getElementById("delete_byFIO_person_firstName").value;
+        var lastName = document.getElementById("delete_byFIO_person_lasName").value;
+        var middleName = document.getElementById("delete_byFIO_person_middleName").value;
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("DELETE", "http://localhost:8888/person/", true);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        var json = JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+            middleName: middleName
+        });
+        xhttp.send(json);
+        xhttp.onload = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                loadPersons();
+                document.getElementById("delete_by_fio_error").innerHTML =
+                    xhttp.responseText;
+            } else if (this.status == 403) {
+                document.getElementById("delete_by_fio_error").innerHTML =
+                    "<span style='color: red;'>Вам не разрешено данное действие</span>";
+            } else {
+                document.getElementById("delete_by_fio_error").innerHTML =
+                    xhttp.responseText;
+            }
+        }
+
+    }
+    function editPerson() {
+        var id = document.getElementById("edit_person_id").value;
+        var firstName = document.getElementById("edit_person_firstName").value;
+        var lastName = document.getElementById("edit_person_lasName").value;
+        var middleName = document.getElementById("edit_person_middleName").value;
+        var birthDate = document.getElementById("edit_person_birthDate").value;
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("PUT", "http://localhost:8888/person/?id=" + id, true);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        var json = JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+            middleName: middleName,
+            birthDate: birthDate
+        });
+        xhttp.send(json);
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var html = '<tr>\n' +
+                    '        <th>Person First Name</th>\n' +
+                    '        <th>Person Last Name</th>\n' +
+                    '        <th>Person Middle Name</th>\n' +
+                    '        <th>Person Birth Date</th>\n' +
+                    '    </tr>';
+                var person = JSON.parse(this.responseText);
+                    html = html +
+                        '        <td>' + person.firstName + '</td>\n' +
+                        '        <td>' + person.lastName + '</td>\n' +
+                        '        <td>' + person.middleName + '</td>' +
+                        '        <td>' + person.birthDate + '</td></tr>';
+
+                document.getElementById("personList").innerHTML = html;
+            }else if(this.status == 403){
+                document.getElementById("edit_error").innerHTML="<span style='color: red;'>Вам не разрешено данное действие</span>";
+            }else if(this.status == 400){
+                document.getElementById("edit_error").innerHTML=this.responseText;
+            }
+            xhttp.onload = function () {
+                loadPersons();
+            }
+        }
+    }
+
+
+
+    function deleteById() {
+        var id = document.getElementById("delete_by_id").value;
+        if (isNaN(id)) {
+            document.getElementById("error").innerHTML = "Введите корректный ID";
+        } else {
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.open("DELETE", "http://localhost:8888/person/" + id, true);
+            xhttp.send();
+            xhttp.onreadystatechange = function () {
+                if (this.status == 403) {
+                    document.getElementById("error").innerHTML = "<span style='color: red;'>Вам не разрешено данное действие</span>";
+                } else {
+                    document.getElementById("error").innerHTML = this.responseText;
+                }
+                xhttp.onload = function () {
+                    loadPersons();
+                }
+
+            }
+        }
+    }
+
+    function createPerson() {
+        var firstName = document.getElementById("person_firstName").value;
+        var lastName = document.getElementById("person_lasName").value;
+        var middleName = document.getElementById("person_middleName").value;
+        var birthDate = document.getElementById("person_birthDate").value;
+
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST", "http://localhost:8888/person/");
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+
+        var json = JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+            middleName: middleName,
+            birthDate: birthDate
+        });
+        console.log(json);
+        xmlhttp.send(json);
+
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var html = '<tr>\n' +
+                    '        <th>Person First Name</th>\n' +
+                    '        <th>Person Last Name</th>\n' +
+                    '        <th>Person Middle Name</th>\n' +
+                    '        <th>Person Birth Date</th>\n' +
+                    '    </tr>';
+                var person = JSON.parse(this.responseText);
+                html = html +
+                    '        <td>' + person.firstName + '</td>\n' +
+                    '        <td>' + person.lastName + '</td>\n' +
+                    '        <td>' + person.middleName + '</td>' +
+                    '        <td>' + person.birthDate + '</td></tr>';
+
+                document.getElementById("personList").innerHTML = html;
+            }
+        }
+        xmlhttp.onload = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                    loadPersons();
+                } else if (this.status == 403) {
+                    document.getElementById("add_error").innerHTML =
+                        "<span style='color: red;'>Вам не разрешено данное действие</span>";
+                } else {
+                    document.getElementById("add_error").innerHTML =
+                        xmlhttp.responseText;
+            }
+        }
+    }
+
+
+    function loadPersons() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var persons = JSON.parse(this.responseText);
+                var html = '<tr>\n' +
+                    '        <th>Person First Name</th>\n' +
+                    '        <th>Person Last Name</th>\n' +
+                    '        <th>Person Middle Name</th>\n' +
+                    '        <th>Person Birth Date</th>\n' +
+                    '        <th>Borrowed Books</th>\n' +
+                    '    </tr>';
+                for (var i = 0; i < persons.length; i++) {
+                    var person = persons[i];
+                    console.log(person);
+                    html = html +
+                        '        <td>' + person.firstName + '</td>\n' +
+                        '        <td>' + person.lastName + '</td>\n' +
+                        '        <td>' + person.middleName + '</td>' +
+                        '        <td>' + person.birthDate + '</td>'+
+                        '        <td>' + person.books.map(a => a.name)
+                        + '</td></tr>';
+
+                }
+                document.getElementById("personsList").innerHTML = html;
+            }if(this.status == 403){
+                document.getElementById("personsList").innerHTML="Таблица всех людей отображается только для админа";
+            }
+        };
+        xhttp.open("GET", "http://localhost:8888/person/", true);
+        xhttp.send();
+    }
+
+    function loadById() {
+        var id = document.getElementById("load_by_id").value;
+        if (isNaN(id)) {
+            document.getElementById("load_by_id_message").innerHTML = "Введите корректный ID";
+        } else {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("InfoField").innerHTML = "Взятые книги:";
+                    var books = JSON.parse(this.responseText);
+                    var html = '<tr>\n' +
+                        '        <th>Book Name</th>\n' +
+                        '        <th>Genre Name</th>\n' +
+                        '        <th>Author Name</th>\n' +
+                        '        <th>Author Last Name</th>\n' +
+                        '        <th>Author Middle Name</th>\n' +
+                        '        <th>Author Birth Date</th>\n' +
+                        '    </tr>';
+                    for (var i = 0; i < books.length; i++) {
+                        var book = books[i];
+                        console.log(book);
+                        html = html +
+                            '        <td>' + book.name + '</td>\n' +
+                            '        <td>' + book.genres.map(a => a.name) +
+                            '        <td>' + book.author.firstName + '</td>\n' +
+                            '        <td>' + book.author.lastName + '</td>\n' +
+                            '        <td>' + book.author.middleName + '</td>' +
+                            '        <td>' + book.author.birthDate + '</td></tr>';
+
+                    }
+                    document.getElementById("personList").innerHTML = html;
+                }
+            }
+
+            xhttp.open("GET", "http://localhost:8888/person/" + id, true);
+            xhttp.send();
+            xhttp.onload = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    loadPersons();
+                } else {
+                    document.getElementById("load_by_id_message").innerHTML =
+                        xhttp.responseText;
+                }
+            }
+        }
+    }
+
+    function returnBook() {
+        var personId = document.getElementById("person_id").value;
+        if (isNaN(personId)) {
+            document.getElementById("return_error").innerHTML = "Введите корректный ID";
+        } else {
+            var bookName = document.getElementById("book_name").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("PUT", "http://localhost:8888/person/return?personId=" + personId + "&bookName=" + bookName, true);
+            xhttp.send();
+            xhttp.onload = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    loadPersons();
+                    document.getElementById("return_error").innerHTML = "OK";
+                } else {
+                    document.getElementById("return_error").innerHTML =
+                        xhttp.responseText;
+                }
+            }
+        }
+    }
+    function borrowBook() {
+        var personId = document.getElementById("person_id").value;
+        if (isNaN(personId)) {
+            document.getElementById("borrow_error").innerHTML = "Введите корректный ID";
+        } else {
+            var bookName = document.getElementById("book_name").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("PUT", "http://localhost:8888/person/borrow?personId=" + personId + "&bookName=" + bookName, true);
+            xhttp.send();
+            xhttp.onload = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    loadPersons();
+                    document.getElementById("borrow_error").innerHTML = "OK";
+                } else {
+                    document.getElementById("borrow_error").innerHTML =
+                        xhttp.responseText;
+                }
+            }
+        }
+    }
+
+
+    loadPersons();
+
+</script>
+
+</body>
+</html>

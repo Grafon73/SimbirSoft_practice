@@ -78,7 +78,7 @@
            xhttp.send();
            xhttp.onreadystatechange = function () {
                if (this.status == 403) {
-                   document.getElementById("error").innerHTML = "Вам не разрешено данное действие";
+                   document.getElementById("error").innerHTML = "<span style='color: red;'>Вам не разрешено данное действие</span>";
                } else {
                    document.getElementById("error").innerHTML = this.responseText;
                }
@@ -135,15 +135,10 @@
                        for (var i = 0; i < author.books.length; i++) {
                            var book = author.books[i];
                            console.log(book);
-                           genreNames = "";
-                           for (var j = 0; j < book.genres.length; j++) {
-                               var genre = book.genres[j];
-                               console.log(genre);
-                               genreNames = genreNames + genre.name + " ";
-                           }
                            html = html +
                                '        <td>' + book.name + '</td>\n' +
-                               '        <td>' + genreNames + '</td></tr>\n';
+                               '        <td>' + book.genres.map(a => a.name)+
+                               '</td></tr>\n';
 
                        }
                        document.getElementById("bookList").innerHTML = html;
@@ -154,7 +149,7 @@
                        document.getElementById("add_error").innerHTML = "OK";
                        loadAuthors();
                    } else if (this.status == 403) {
-                       document.getElementById("add_error").innerHTML = "Вам не разрешено данное действие";
+                       document.getElementById("add_error").innerHTML = "<span style='color: red;'>Вам не разрешено данное действие</span>";
                    } else {
                        document.getElementById("add_error").innerHTML = xmlhttp.responseText;
                    }
@@ -207,15 +202,10 @@
                            for (var i = 0; i < author.books.length; i++) {
                                var book = author.books[i];
                                console.log(book);
-                               genreNames = "";
-                               for (var j = 0; j < book.genres.length; j++) {
-                                   var genre = book.genres[j];
-                                   console.log(genre);
-                                   genreNames = genreNames + genre.name + " ";
-                               }
                                html = html +
                                    '        <td>' + book.name + '</td>\n' +
-                                   '        <td>' + genreNames + '</td></tr>\n';
+                                   '        <td>' + book.genres.map(a => a.name)+
+                                   '</td></tr>\n';
 
                            }
                            document.getElementById("bookList").innerHTML = html;
@@ -287,7 +277,6 @@
            var bookCounter = 0;
 
            function addBooks() {
-               var genresCounter = 0;
                var myForm = document.getElementById("formBooks");
                bookCounter++;
                var br = document.createElement("br");

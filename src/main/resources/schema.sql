@@ -1,5 +1,18 @@
 DROP ALL OBJECTS;
 
+CREATE TABLE IF NOT EXISTS users (
+username VARCHAR(50) NOT NULL,
+password VARCHAR(100) NOT NULL,
+enabled TINYINT NOT NULL DEFAULT 1,
+PRIMARY KEY (username)
+);
+
+CREATE TABLE IF NOT EXISTS authorities (
+username VARCHAR(50) NOT NULL,
+authority VARCHAR(50) NOT NULL,
+FOREIGN KEY (username) REFERENCES users(username)
+);
+
 CREATE TABLE IF NOT EXISTS genre     (
 genre_id       INTEGER                  NOT NULL   COMMENT 'ID жанра' PRIMARY KEY AUTO_INCREMENT,
 version        INTEGER                  NOT NULL   COMMENT 'Служебное поле hibernate',
@@ -29,7 +42,9 @@ first_name      VARCHAR(50)              NOT NULL   COMMENT 'Имя',
 last_name       VARCHAR(50)              NOT NULL   COMMENT 'Фамилия',
 middle_name     VARCHAR(50)                         COMMENT 'Отчество',
 create_date     TIMESTAMP WITH TIME ZONE NOT NULL   COMMENT 'Время создания записи',
-update_date     TIMESTAMP WITH TIME ZONE            COMMENT 'Время изменения записи'
+update_date     TIMESTAMP WITH TIME ZONE            COMMENT 'Время изменения записи',
+username        VARCHAR(50)                         COMMENT 'Логин',
+FOREIGN KEY (username) REFERENCES users(username)
 );
 COMMENT ON TABLE person IS 'Человек';
 
@@ -64,18 +79,6 @@ in_library         BOOLEAN                             COMMENT 'Находитс
 );
 COMMENT ON TABLE book IS 'Связь Книги с Жанром(библиотечная карточка)';
 
-CREATE TABLE IF NOT EXISTS users (
-username VARCHAR(50) NOT NULL,
-password VARCHAR(100) NOT NULL,
-enabled TINYINT NOT NULL DEFAULT 1,
-PRIMARY KEY (username)
-);
-
-CREATE TABLE IF NOT EXISTS authorities (
-username VARCHAR(50) NOT NULL,
-authority VARCHAR(50) NOT NULL,
-FOREIGN KEY (username) REFERENCES users(username)
-);
 
 CREATE UNIQUE INDEX ix_auth_username
     on authorities (username,authority);

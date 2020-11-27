@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.simbirsoft.homework.book.model.BookEntity;
 import ru.simbirsoft.homework.librarycard.model.LibraryCard;
+import ru.simbirsoft.homework.userinterface.model.User;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,7 +14,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -87,6 +90,10 @@ public class PersonEntity {
             cascade = CascadeType.ALL
             )
     private Set<LibraryCard> books;
+
+    @OneToOne
+    @JoinColumn(name = "username")
+    private User user;
 
     @PrePersist
     protected void onCreate() {

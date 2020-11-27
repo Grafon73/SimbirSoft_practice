@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Books</h2>
+
+<br />
+<br />
+
+<input id="book_name" placeholder="Название книги">
+<input id="book_genres" placeholder="Жанры, через запятую">
+<input type=date id="book_publicated" placeholder="Дата публикации книги">
+<label for="book_publicated">Дата публикации книги</label>
+<br />
+<input id="author_firstName" placeholder="Имя автора">
+<input id="author_lasName" placeholder="Фамилия автора">
+<input id="author_middleName" placeholder="Отчество автора">
+<input type=date id="author_birthDate" placeholder="Дата рождения автора">
+<label for="author_birthDate">Дата рождения автора</label>
+<br />
+<button id="add_book" onclick="addBook()">Add Book</button>
+<label id="add_error" for="add_book">Добавить книгу</label>
+
+<br />
+<br />
+<br />
+<input id="delete_by_id">
+<button onclick="deleteBook()">Delete by ID</button>
+<label id="removeError" for="delete_by_id">Удалить книгу по ID</label>
+<br />
+<br />
+<input id="load_by_genre">
+<button onclick="loadByGenre()">Load By Genre</button>
+<label id="load_by_genre_message" for="load_by_genre">Получить список книг по жанру</label>
+
+<br />
+<br />
+<input id="find_by_author_firstName" placeholder="Author First Name">
+<input id="find_by_author_lasName" placeholder="Author Last Name">
+<input id="find_by_author_middleName" placeholder="Author Middle Name">
+<button id ="load_by_author" onclick="loadByAuthor()">Load by Author</button>
+<label id="load_by_author_message" for="load_by_author">Получить список книг по автору</label>
+<br />
+<br />
+<input id="edit_book_name" placeholder="Название книги">
+<input id="edit_book_genres" placeholder="Жанры, через запятую">
+<button id="edit_book" onclick="editBook()">Edit book</button>
+<label id="edit_error" for="edit_book">Изменить жанр книги</label>
+
+<br />
+<br />
+
+<input id="find_genre" placeholder="Жанр книиги">
+<select id="find_param">
+    <option>BEFORE</option>
+    <option>AFTER</option>
+    <option>EQUALS</option>
+</select>
+<input id="find_date" type="number" min="1900" max="2099" step="1" value="" placeholder="Дата публикации" />
+<label for="find_date">Дата публикации: До/После/Конкретный год</label>
+<br />
+<button id="find_books_by_date" onclick="findByDateAndGenre()">Find Books</button>
+<label id="find_error" for="find_books_by_date">Найти книги по жанру и дате публикации</label>
+
+<br />
+<br />
+<h1 id="authorName"></h1>
+
+<table id="bookList">
+
+</table>
+<script>
+    function deleteBook() {
+        var id = document.getElementById("delete_by_id").value;
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.open("DELETE", "http://localhost:8888/books/?id=" + id, true);
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+            if (this.status == 403) {
+                document.getElementById("removeError").innerHTML = "<span style='color: red;'>Вам не разрешено данное действие</span>";
+            } else {
+                document.getElementById("removeError").innerHTML = this.responseText;
+            }
+        }
+    }
+
+    function addBook() {
+        var firstName = document.getElementById("author_firstName").value;
+        var lastName = document.getElementById("author_lasName").value;
+        var middleName = document.getElementById("author_middleName").value;
+        var birthDate = document.getElementById("author_birthDate").value;
+        var bookName = document.getElementById("book_name").value;
+        var publicationDate = document.getElementById("book_publicated").value;
+        var bookGenres = document.getElementById("book_genres").value;
+
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST", "http://localhost:8888/books/");
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+
+        var genres = [];
+            var listOfgenres = bookGenres.split(",");
+            for (var j = 0; j < listOfgenres.length; j++) {
+                var genreJson = {name: listOfgenres[j]}
+                genres.push(genreJson);
+            }
+
+        var json = JSON.stringify({
+            name: bookName,
+            publicated:publicationDate,
+            author: {
+            firstName: firstName,
+            lastName: lastName,
+            middleName: middleName,
+            birthDate: birthDate },
+            genres: genres
+        });
+        console.log(json);
+        xmlhttp.send(json);
+
+    xmlhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+
+            var html = '<tr>\n' +
+                '        <th>Book Name</th>\n' +
+                '        <th>Genre Name</th>\n' +
+                '        <th>Publication date</th>\n' +
+                '        <th>Author firstName</th>\n' +
+                '        <th>Author lastName</th>\n' +
+                '        <th>Author middleName</th>\n' +
+                '        <th>Author birthDate</th>\n' +
+                '    </tr>';
+            var book = JSON.parse(this.responseText);
+                html = html +
+                    '        <td>' + book.name + '</td>\n' +
+                    '        <td>' + book.genres.map(a => a.name) + '</td>\n' +
+                    '        <td>' + book.publicated + '</td>\n' +
+                    '        <td>' + book.author.firstName + '</td>' +
+                    '        <td>' + book.author.lastName + '</td>' +
+                    '        <td>' + book.author.middleName + '</td>' +
+                    '        <td>' + book.author.birthDate + '</td></tr>';
+
+
+            document.getElementById("bookList").innerHTML = html;
+        } else if (this.status == 403) {
+            document.getElementById("add_error").innerHTML = "<span style='color: red;'>Вам не разрешено данное действие</span>";
+        }else {
+            document.getElementById("bookList").innerHTML = xmlhttp.responseText;
+        }
+    }
+}
+
+    function loadByGenre() {
+        var name = document.getElementById("load_by_genre").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var books = JSON.parse(this.responseText);
+                    var html = '<tr>\n' +
+                        '        <th>Book Name</th>\n' +
+                        '        <th>Genre Name</th>\n' +
+                        '        <th>Publication date</th>\n' +
+                        '        <th>Author firstName</th>\n' +
+                        '        <th>Author lastName</th>\n' +
+                        '        <th>Author middleName</th>\n' +
+                        '        <th>Author birthDate</th>\n' +
+                        '    </tr>';
+                    for (var i = 0; i < books.length; i++) {
+                        var book = books[i];
+                        html = html +
+                            '        <td>' + book.name + '</td>\n' +
+                            '        <td>' + book.genres.map(a => a.name) + '</td>\n' +
+                            '        <td>' + book.publicated + '</td>\n' +
+                            '        <td>' + book.author.firstName + '</td>' +
+                            '        <td>' + book.author.lastName + '</td>' +
+                            '        <td>' + book.author.middleName + '</td>' +
+                            '        <td>' + book.author.birthDate + '</td></tr>';
+
+                    }
+                    document.getElementById("bookList").innerHTML = html;
+                } else {
+                    document.getElementById("bookList").innerHTML = xhttp.responseText;
+                }
+            };
+            xhttp.open("GET", "http://localhost:8888/books/" + name, true);
+            xhttp.send();
+    }
+
+    function loadByAuthor() {
+        var firstName = document.getElementById("find_by_author_firstName").value;
+        var lastName = document.getElementById("find_by_author_lasName").value;
+        var middleName = document.getElementById("find_by_author_middleName").value;
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var books = JSON.parse(this.responseText);
+                var html = '<tr>\n' +
+                    '        <th>Book Name</th>\n' +
+                    '        <th>Genre Name</th>\n' +
+                    '        <th>Publication date</th>\n' +
+                    '        <th>Author firstName</th>\n' +
+                    '        <th>Author lastName</th>\n' +
+                    '        <th>Author middleName</th>\n' +
+                    '        <th>Author birthDate</th>\n' +
+                    '    </tr>';
+                for (var i = 0; i < books.length; i++) {
+                    var book = books[i];
+                    html = html +
+                        '        <td>' + book.name + '</td>\n' +
+                        '        <td>' + book.genres.map(a => a.name) + '</td>\n' +
+                        '        <td>' + book.publicated + '</td>\n' +
+                        '        <td>' + book.author.firstName + '</td>' +
+                        '        <td>' + book.author.lastName + '</td>' +
+                        '        <td>' + book.author.middleName + '</td>' +
+                        '        <td>' + book.author.birthDate + '</td></tr>';
+
+                }
+                document.getElementById("bookList").innerHTML = html;
+            } else {
+                document.getElementById("bookList").innerHTML = xhttp.responseText;
+            }
+        };
+        var request="";
+        if (firstName) {
+            request = request + "firstName=" + firstName + "&";
+        }
+        if (lastName) {
+            request = request + "lastName=" + lastName + "&";
+        }
+        if (middleName) {
+            request = request + "middleName=" + middleName + "&";
+        }
+        xhttp.open("GET", "http://localhost:8888/books/?"+request, true);
+        xhttp.send();
+    }
+
+    function findByDateAndGenre() {
+
+        var genre = document.getElementById("find_genre").value;
+        var date = document.getElementById("find_date").value;
+        var param = document.getElementById("find_param").value;
+
+        var requset = "http://localhost:8888/books/filter?";
+        if (genre) {
+            requset = requset + "genre=" + genre + "&";
+        }
+        if (date) {
+            requset = requset + "year=" + date + "&attribute=" + param;
+        }
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var books = JSON.parse(this.responseText);
+                var html = '<tr>\n' +
+                    '        <th>Book Name</th>\n' +
+                    '        <th>Genre Name</th>\n' +
+                    '        <th>Publication date</th>\n' +
+                    '        <th>Author firstName</th>\n' +
+                    '        <th>Author lastName</th>\n' +
+                    '        <th>Author middleName</th>\n' +
+                    '        <th>Author birthDate</th>\n' +
+                    '    </tr>';
+                for (var i = 0; i < books.length; i++) {
+                    var book = books[i];
+                    html = html +
+                        '        <td>' + book.name + '</td>\n' +
+                        '        <td>' + book.genres.map(a => a.name) + '</td>\n' +
+                        '        <td>' + book.publicated + '</td>\n' +
+                        '        <td>' + book.author.firstName + '</td>' +
+                        '        <td>' + book.author.lastName + '</td>' +
+                        '        <td>' + book.author.middleName + '</td>' +
+                        '        <td>' + book.author.birthDate + '</td></tr>';
+
+                }
+                document.getElementById("bookList").innerHTML = html;
+            } else {
+                document.getElementById("bookList").innerHTML = xhttp.responseText;
+            }
+        };
+        xhttp.open("GET", requset, true);
+        xhttp.send();
+    }
+
+    function editBook(){
+        var bookName = document.getElementById("edit_book_name").value;
+        var bookGenres = document.getElementById("edit_book_genres").value;
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("PUT", "http://localhost:8888/books/");
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        var genres = [];
+        var listOfgenres = bookGenres.split(",");
+        for (var j = 0; j < listOfgenres.length; j++) {
+            var genreJson = {name: listOfgenres[j]}
+            genres.push(genreJson);
+        }
+
+        var json = JSON.stringify({
+            name: bookName,
+            genres: genres
+        });
+        console.log(json);
+        xmlhttp.send(json);
+
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+
+                var html = '<tr>\n' +
+                    '        <th>Book Name</th>\n' +
+                    '        <th>Genre Name</th>\n' +
+                    '        <th>Publication date</th>\n' +
+                    '        <th>Author firstName</th>\n' +
+                    '        <th>Author lastName</th>\n' +
+                    '        <th>Author middleName</th>\n' +
+                    '        <th>Author birthDate</th>\n' +
+                    '    </tr>';
+                var book = JSON.parse(this.responseText);
+                html = html +
+                    '        <td>' + book.name + '</td>\n' +
+                    '        <td>' + book.genres.map(a => a.name) + '</td>\n' +
+                    '        <td>' + book.publicated + '</td>\n' +
+                    '        <td>' + book.author.firstName + '</td>' +
+                    '        <td>' + book.author.lastName + '</td>' +
+                    '        <td>' + book.author.middleName + '</td>' +
+                    '        <td>' + book.author.birthDate + '</td></tr>';
+
+
+                document.getElementById("bookList").innerHTML = html;
+            } else if (this.status == 403) {
+                document.getElementById("edit_error").innerHTML = "<span style='color: red;'>Вам не разрешено данное действие</span>";
+            }else {
+                document.getElementById("bookList").innerHTML = xmlhttp.responseText;
+            }
+        }
+
+    }
+
+</script>
+
+</body>
+</html>

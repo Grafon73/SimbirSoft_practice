@@ -1,4 +1,4 @@
-package ru.simbirsoft.homework.authorization.model;
+package ru.simbirsoft.homework.userinterface.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

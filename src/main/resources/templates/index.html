@@ -1,20 +1,103 @@
 <!DOCTYPE HTML>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Главная</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel="stylesheet" type="text/css" href="${contextPath}/resources/css/style.css">
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
 </head>
 <body>
 <div>
-        <h4><a href="/login">Войти   Тестовые пользователи: ADMIN: admin:admin    USER 1:1</a></h4>
+    <h1 id="username"></h1>
+
+        <h4><a href="/login">Войти</a></h4>
         <h4><a href="/registration">Зарегистрироваться (Только как юзер)</a></h4>
         <h4><a href="/logout">Выйти</a></h4>
     <h4><a href="/ui/authors/">Управление авторами</a></h4>
-    <h4><a href="/ui/books/">Управление книгами(Не готово)</a></h4>
-    <h4><a href="/ui/genre/">Управление жанрами(Не готово)</a></h4>
-    <h4><a href="/ui/library/">Управление записями о взятых книгах(Не готово)</a></h4>
-    <h4><a href="/ui/person/">Управление информацией о людях(Не готово)</a></h4>
+    <h4><a href="/ui/books/">Управление книгами</a></h4>
+    <h4><a href="/ui/genres/">Управление жанрами</a></h4>
+    <h4><a href="/ui/library/">Управление записями о взятых книгах (Доступ только администратору)</a></h4>
+    <h4><a href="/ui/persons/">Управление информацией о людях</a></h4>
+
 </div>
+<br/>
+<br/>
+<form>
+    *Логины и пароли для тестов*
+<br/>
+Олег	    Резин	Степанович	    Login:1      Pass:1      Role: User
+<br/>
+Иван	    Бочкин	Евгеньевич	    Login:2      Pass:2      Role: User
+<br/>
+Дмитрий	    Королев	Иванович	    Login:3      Pass:3      Role: User
+<br/>
+Егор	    Лапин	Валерьевич	    Login:4      Pass:4      Role: User
+<br/>
+Александр	Белугин	Александрович	Login: admin Pass: admin Role: Admin
+</form>
+<br/>
+<br/>
+<button id="load_books" onclick="loadBooks()">Load Books</button>
+<label id="load_error" for="load_books">Получить список взятых книг</label>
+<table id="books">
+
+</table>
+<script th:inline="javascript">
+    function loadLogins() {
+        var name =  [[${name}]];
+        var role = [[${role}]];
+        if(name === 'anonymousUser'){
+            document.getElementById('username').innerHTML = "Hello, "+name;
+        }else{
+            var lastName = name.lastName;
+            var firstName = name.firstName;
+            var middleName = name.middleName;
+            document.getElementById('username').innerHTML = "Hello, "
+                +lastName+" "+ firstName+" "+middleName+" "+ role[0].authority;
+        }
+    }
+    function loadBooks() {
+        var name =  [[${name}]];
+        var books =name.books;
+        var html = '<tr>\n' +
+            '        <th>Book Name</th>\n' +
+            '        <th>Genre Name</th>\n' +
+            '        <th>Publication date</th>\n' +
+            '        <th>Author firstName</th>\n' +
+            '        <th>Author lastName</th>\n' +
+            '        <th>Author middleName</th>\n' +
+            '        <th>Author birthDate</th>\n' +
+            '    </tr>';
+        for (var i = 0; i < books.length; i++) {
+            var book = books[i];
+            html = html +
+                '        <td>' + book.name + '</td>\n' +
+                '        <td>' + book.genres.map(a => a.name) + '</td>\n' +
+                '        <td>' + book.publicated + '</td>\n' +
+                '        <td>' + book.author.firstName + '</td>' +
+                '        <td>' + book.author.lastName + '</td>' +
+                '        <td>' + book.author.middleName + '</td>' +
+                '        <td>' + book.author.birthDate + '</td></tr>';
+
+        }
+        document.getElementById("books").innerHTML = html;
+    }
+    loadLogins();
+</script>
 </body>
 </html>

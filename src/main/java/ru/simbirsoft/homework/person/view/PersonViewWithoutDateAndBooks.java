@@ -1,10 +1,9 @@
 package ru.simbirsoft.homework.person.view;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 
 /**
@@ -17,22 +16,18 @@ public class PersonViewWithoutDateAndBooks {
     /**
      * Имя
      */
-    @NotNull(message = "Имя не может быть пустым")
-    @JsonProperty("Имя")
+    @NotBlank(message = "Имя не может быть пустым")
     private String firstName;
 
     /**
      * Фамилия
      */
-    @NotNull(message = "Фамилия не может быть пустым")
-    @JsonProperty("Фамилия")
+    @NotBlank(message = "Фамилия не может быть пустым")
     private String lastName;
 
     /**
      * Отчество
      */
-    @NotNull(message = "Отчество не может быть пустым")
-    @JsonProperty("Отчество")
     private String middleName;
 }
 

@@ -11,7 +11,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
@@ -33,8 +32,9 @@ public class CustomBookRepoImpl implements CustomBookRepo {
     private CriteriaQuery<BookEntity> buildCriteriaForFind(String genre, Integer year, Attribute attribute) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<BookEntity> criteria = builder.createQuery(BookEntity.class);
+        criteria.distinct(true);
         Root<BookEntity> obj = criteria.from(BookEntity.class);
-        Join<BookEntity, GenreEntity> join = obj.join("genres", JoinType.INNER);
+        Join<BookEntity, GenreEntity> join = obj.join("genres");
         Predicate predicate = builder.conjunction();
         if(genre!=null && obj.get("genres")!=null){
             predicate = builder.and(predicate, builder.equal(join.get("name"), genre));

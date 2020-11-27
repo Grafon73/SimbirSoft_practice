@@ -1,7 +1,7 @@
-package ru.simbirsoft.homework.authorization.repository;
+package ru.simbirsoft.homework.userinterface.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.simbirsoft.homework.authorization.model.User;
+import ru.simbirsoft.homework.userinterface.model.User;
 
 import java.util.Optional;
 
