@@ -1,10 +1,9 @@
 package ru.simbirsoft.homework.genre.view;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 /**
  * View-класс для Genre
@@ -16,8 +15,7 @@ public class GenreView {
     /**
      * Название жанра
      */
-    @NotNull(message = "Название не может быть пустым")
-    @JsonProperty("Название жанра")
+    @NotBlank(message = "Жанр не может быть пустым")
     private String name;
 
 }

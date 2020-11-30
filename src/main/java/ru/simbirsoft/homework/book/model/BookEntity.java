@@ -26,6 +26,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
@@ -61,6 +62,18 @@ public class BookEntity {
     private String name;
 
     /**
+     * Дата поступления в бибилотеку
+     */
+    @Column(name = "admission_date")
+    private Date admited;
+
+    /**
+     * Дата поблукации
+     */
+    @Column(name = "publication_date")
+    private Date publicated;
+
+    /**
      * Время создания записи
      */
     @Column(name = "create_date",columnDefinition = "timestamp with time zone")
@@ -90,9 +103,7 @@ public class BookEntity {
     private AuthorEntity author;
 
     @OneToMany(
-            mappedBy = "book",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            mappedBy = "book"
     )
     private Set<LibraryCard> persons;
 

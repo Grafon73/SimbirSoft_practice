@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:security="http://www.springframework.org/tags/form"
+      xmlns:form="http://www.w3.org/1999/xhtml">
+<html >
+<body>
+<form th:action="@{/registration}" th:object="${user}" method="post" enctype="utf8">
+<h1>Registration</h1>
+    <div>
+        <label>Username</label>
+        <input th:field="*{username}"/>
+        <span th:if="${error != null}" th:text="${error}">Username already exist</span>
+        <th:errors path="username" message = "${usernameError}" ></th:errors>
+
+    </div>
+    <div>
+        <label>Password</label>
+        <input type="password" th:field="*{password}"/>
+    </div>
+    <button type="submit">submit</button>
+</form>
+
+</body>
+</html>

@@ -1,14 +1,15 @@
 package ru.simbirsoft.homework.book.view;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import ru.simbirsoft.homework.author.view.AuthorWithoutBooks;
 import ru.simbirsoft.homework.genre.view.GenreView;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -21,16 +22,20 @@ public class BookView {
     /**
      * Название книги
      */
-    @NotNull(message = "Название не может быть пустым")
-    @JsonProperty("Название книги")
+    @NotBlank(message = "Название не может быть пустым")
     private String name;
+
+    /**
+     * Дата публикации
+     */
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private Date publicated;
 
     /**
      * Жанры книги
      */
     @Valid
     @JsonIgnoreProperties({"bookList","author","genres"})
-    @JsonProperty("Жанры")
     private Set<GenreView> genres;
 
     /**
@@ -38,6 +43,5 @@ public class BookView {
      */
     @Valid
     @JsonIgnoreProperties({"genres","author","bookList"})
-    @JsonProperty("Автор")
     private AuthorWithoutBooks author;
 }

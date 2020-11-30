@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,7 @@ public class PersonController {
     private final PersonService personService;
 
    @PostMapping("/")
+   @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Добавить человека в список", httpMethod = "POST")
    public ResponseEntity<PersonViewWithoutBooks> addPerson(@Valid @RequestBody PersonViewWithoutBooks personView){
       personService.addPerson(personView);
@@ -40,6 +42,7 @@ public class PersonController {
    }
 
    @PutMapping("/")
+   @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Изменить ифнормацию о человеке", httpMethod = "PUT")
    public ResponseEntity<PersonViewWithoutBooks> editPerson(
            @RequestParam Integer id,
@@ -48,6 +51,7 @@ public class PersonController {
    }
 
    @DeleteMapping("/{id}")
+   @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Удалить человека из списка по ID", httpMethod = "DELETE")
    public ResponseEntity<String> removePerson(@PathVariable Integer id) {
       personService.removePerson(id);
@@ -55,6 +59,7 @@ public class PersonController {
    }
 
    @DeleteMapping("/")
+   @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Удалить человека из списка по ФИО", httpMethod = "DELETE")
    public ResponseEntity<String> removePerson(
            @Valid @RequestBody PersonViewWithoutDateAndBooks personView) {
@@ -68,6 +73,7 @@ public class PersonController {
    }
 
    @PutMapping("/borrow")
+   @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Добавить книгу в список книг человека", httpMethod = "PUT")
    public ResponseEntity<PersonView> borrowBook(@RequestParam Integer personId,
                                                 @RequestParam String bookName){
@@ -75,6 +81,7 @@ public class PersonController {
    }
 
    @PutMapping("/return")
+   @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Убрать книгу из списка книг человека", httpMethod = "PUT")
    public ResponseEntity<PersonView> returnBook(@RequestParam Integer personId,
                                                  @RequestParam String bookName){
@@ -82,6 +89,7 @@ public class PersonController {
    }
 
     @GetMapping("/")
+    @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "*ДЛЯ ТЕСТОВ* Получить список всех людей", httpMethod = "GET")
     public ResponseEntity<List<PersonView>> getAll(){
         return ResponseEntity.ok(personService.getAllPersons());

@@ -10,6 +10,7 @@ import ru.simbirsoft.homework.book.view.BookView;
 import ru.simbirsoft.homework.exception.CustomRuntimeException;
 import ru.simbirsoft.homework.exception.DataNotFoundException;
 import ru.simbirsoft.homework.librarycard.model.LibraryCard;
+import ru.simbirsoft.homework.librarycard.repository.LibraryRepo;
 import ru.simbirsoft.homework.mapper.MyCustomMapperForPerson;
 import ru.simbirsoft.homework.person.model.PersonEntity;
 import ru.simbirsoft.homework.person.repository.PersonRepo;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,6 +32,7 @@ public class PersonServiceImpl implements PersonService{
     private final PersonRepo personRepo;
     private final MapperFactory mapperFactory;
     private final BookRepo bookRepo;
+    private final LibraryRepo libraryRepo;
 
 
     @Override
@@ -46,8 +49,11 @@ public class PersonServiceImpl implements PersonService{
         PersonEntity personEntity = personRepo
                 .findById(id)
                 .orElseThrow(()->
-                        new DataNotFoundException("Человека с ID "+id));
-        Set<LibraryCard> libraryCard = personEntity.getBooks();
+                        new DataNotFoundException("Не найден человек с ID "+id));
+        Set<LibraryCard> libraryCard = personEntity.getBooks()
+                .stream()
+                .filter(a->!a.isInLibrary())
+                .collect(Collectors.toSet());
         Set<BookEntity> books = new HashSet<>();
         libraryCard.forEach(a->books.add(a.getBook()));
         return mapperFactory.getMapperFacade()
@@ -89,7 +95,7 @@ public class PersonServiceImpl implements PersonService{
                 .orElseThrow(()->
                         new DataNotFoundException(
                                 "Не найдена информация по Человеку с ID "+id));
-        if(!personEntity.getBooks().isEmpty()){
+        if(!personEntity.getBooks().stream().allMatch(LibraryCard::isInLibrary)){
             throw new CustomRuntimeException("Пользователь не может быть удален, " +
                     "пока не вернет книги");
         }
@@ -110,9 +116,8 @@ public class PersonServiceImpl implements PersonService{
             personView.getMiddleName()));
     }
     personEntity.forEach(a-> {
-                if (!a.getBooks().isEmpty()) {
-                    throw new CustomRuntimeException("Пользователь " +
-                            "c ID" +a.getPersonId()+" не может быть удален, " +
+                if(!a.getBooks().stream().allMatch(LibraryCard::isInLibrary)){
+                    throw new CustomRuntimeException("Пользователь не может быть удален, " +
                             "пока не вернет книги");
                 }
                 personRepo.delete(a);
@@ -131,16 +136,15 @@ public class PersonServiceImpl implements PersonService{
                 new DataNotFoundException(
                 "Книги с названием "+name+" нет в библиотеке"));
 
-        if(!bookEntity.getPersons().isEmpty()){
+        if(!bookEntity.getPersons().stream().allMatch(LibraryCard::isInLibrary)){
             throw new CustomRuntimeException("Книга уже взята из библиотеки");
         }
-        if(personEntity.getBooks().stream().anyMatch(a->
+        if(personEntity.getBooks().stream().filter(a->!a.isInLibrary()).anyMatch(a->
                 LocalDateTime.now().isAfter(a.getReturned()))){
             throw new CustomRuntimeException(
                     "У Человека с ID "+id+" есть просроченная книга");
         }
         personEntity.addBook(bookEntity);
-        personRepo.flush();
         personRepo.save(personEntity);
         mapperFactory.classMap(PersonEntity.class, PersonView.class)
                 .customize(new MyCustomMapperForPerson(mapperFactory))
@@ -156,7 +160,7 @@ public class PersonServiceImpl implements PersonService{
         BookEntity bookEntity = bookRepo.findByName(name).orElseThrow(()->
                 new DataNotFoundException(
                         "Книги с названием "+name+" нет в библиотеке"));
-        if(bookEntity.getPersons().isEmpty()){
+        if(bookEntity.getPersons().isEmpty() || bookEntity.getPersons().stream().allMatch(LibraryCard::isInLibrary)){
             throw new CustomRuntimeException("Книга находится в библиотеке");
         }
         if(personEntity.getBooks().stream()
@@ -164,8 +168,13 @@ public class PersonServiceImpl implements PersonService{
             throw new CustomRuntimeException(
                     String.format("Книга '%s' не у человека c ID %d", name, id));
         }
-        personEntity.removeBook(bookEntity);
-        personRepo.save(personEntity);
+        LibraryCard libraryCard = libraryRepo.findByPerson_PersonIdAndBook_NameAndInLibraryFalse(id,name)
+                .orElseThrow(()->
+                        new CustomRuntimeException("Не найдена запись " +
+                                "в библиотеке для человека с ID "+id+
+                                " и книги с названием "+name));
+        libraryCard.setInLibrary(true);
+        libraryRepo.save(libraryCard);
         mapperFactory.classMap(PersonEntity.class, PersonView.class)
                 .customize(new MyCustomMapperForPerson(mapperFactory))
                 .register();

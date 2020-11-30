@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,7 @@ public class GenreController {
     private final GenreService genreService;
 
     @PostMapping("/")
+    @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Добавить жанр", httpMethod = "POST")
     public ResponseEntity<GenreView> addGenre(@Valid @RequestBody GenreView genreView){
         genreService.add(genreView);
@@ -50,6 +52,7 @@ public class GenreController {
     }
 
     @DeleteMapping("/")
+    @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Удалить жанр", httpMethod = "DELETE")
     public ResponseEntity<List<GenreView>> removeGenre(@RequestParam String name){
         genreService.remove(name);

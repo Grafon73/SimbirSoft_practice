@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Library Cards</h2>
+
+<table id="cardsList">
+
+</table>
+<br />
+<br />
+
+<input id="book_id" placeholder="ID книги">
+<input id="person_id" placeholder="ID человека">
+<input id="days" placeholder="Количество дней">
+<button id="add_days" onclick="addDays()">Add Days</button>
+<label id="add_error" for="add_days">Добавить дней на возврат</label>
+
+<script>
+    function loadGenres() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var html = '<tr>\n' +
+                    '        <th>Person First Name</th>\n' +
+                    '        <th>Person Last Name</th>\n' +
+                    '        <th>Person Middle Name</th>\n' +
+                    '        <th>Person Birth Date</th>\n' +
+                    '        <th>Borrowed Books</th>\n' +
+                    '        <th>Books Genres</th>\n' +
+                    '        <th>Publication Date</th>\n' +
+                    '        <th>Overdue</th>\n' +
+                    '    </tr>';
+                var persons = JSON.parse(this.responseText);
+                for (var i = 0; i < persons.length; i++) {
+                    var person = persons[i];
+                    html = html +
+                        '        <td>' + person.personViewWithoutBooks.firstName + '</td>\n' +
+                        '        <td>' + person.personViewWithoutBooks.lastName + '</td>\n' +
+                        '        <td>' + person.personViewWithoutBooks.middleName + '</td>' +
+                        '        <td>' + person.personViewWithoutBooks.birthDate + '</td>' +
+                        '        <td>' + person.bookViewWithoutAuthor.name + '</td>' +
+                        '        <td>' + person.bookViewWithoutAuthor.genres.map(a=>a.name) + '</td>' +
+                        '        <td>' + person.bookViewWithoutAuthor.publicated + '</td>' +
+                        '        <td>' + person.expired + '</td></tr>';
+                    document.getElementById("cardsList").innerHTML = html;
+                }
+            }
+        }
+            xhttp.open("GET", "http://localhost:8888/library/", true);
+            xhttp.send();
+
+    }
+
+        function addDays() {
+            var bookId = document.getElementById("book_id").value;
+            var personId = document.getElementById("person_id").value;
+            var days = document.getElementById("days").value;
+            var xmlhttp = new XMLHttpRequest();
+            if (isNaN(bookId) || isNaN(personId) || isNaN(days) ||
+            !bookId || !personId || !days) {
+                document.getElementById("add_error").innerHTML = "Введите корректные данные";
+            } else {
+                xmlhttp.open("PUT", "http://localhost:8888/library/?bookID=" + bookId +
+                    "&personID=" + personId + "&days=" + days);
+                xmlhttp.send();
+                xmlhttp.onreadystatechange = function () {
+                    if (this.status == 200) {
+                        document.getElementById("add_error").innerHTML =
+                            "Добавлено " + days + " дней на возврат книги";
+                    }
+                    if (this.status == 403) {
+                        document.getElementById("add_error").innerHTML =
+                            "<span style='color: red;'>Вам не разрешено данное действие</span>";
+                    }
+                    xmlhttp.onload = function () {
+                        loadGenres();
+                    }
+                }
+            }
+        }
+        loadGenres();
+</script>
+</body>
+</html>

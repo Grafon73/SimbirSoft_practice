@@ -1,18 +1,20 @@
 package ru.simbirsoft.homework.author.service;
 
-import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.simbirsoft.homework.author.model.AuthorEntity;
 import ru.simbirsoft.homework.author.repository.AuthorRepo;
+import ru.simbirsoft.homework.author.repository.CustomAuthorRepo;
 import ru.simbirsoft.homework.author.view.AuthorView;
 import ru.simbirsoft.homework.author.view.AuthorWithoutBooks;
 import ru.simbirsoft.homework.book.model.BookEntity;
 import ru.simbirsoft.homework.exception.CustomRuntimeException;
 import ru.simbirsoft.homework.exception.DataNotFoundException;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -22,6 +24,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepo authorRepo;
     private final MapperFactory mapperFactory;
+    private final CustomAuthorRepo customAuthorRepo;
 
     @Override
     public List<AuthorWithoutBooks> getAllAuthors() {
@@ -44,9 +47,11 @@ public class AuthorServiceImpl implements AuthorService {
                                       authorView.getMiddleName())
                         .orElseGet(() -> mapperFactory.getMapperFacade()
                         .map(authorView, AuthorEntity.class));
-        authorEntity.setBooks(Sets.newHashSet(mapperFactory.getMapperFacade()
-                .mapAsList(authorView.getBooks(), BookEntity.class)));
-        authorEntity.getBooks().forEach(a->a.setAuthor(authorEntity));
+        if(authorView.getBooks()!=null){
+            authorEntity.setBooks(new HashSet<>(mapperFactory.getMapperFacade()
+                    .mapAsList(authorView.getBooks(), BookEntity.class)));
+            authorEntity.getBooks().forEach(a->a.setAuthor(authorEntity));
+        }
         authorRepo.save(authorEntity);
         return mapperFactory.getMapperFacade().map(authorView, AuthorView.class);
     }
@@ -71,4 +76,15 @@ public class AuthorServiceImpl implements AuthorService {
 
     }
 
+    @Override
+    public List<AuthorWithoutBooks> getAuthorsByBirthDateAndFIO(
+            String firstName,
+            String lastName,
+            String middleName,
+            Date from,
+            Date to) {
+        return mapperFactory.getMapperFacade().mapAsList(customAuthorRepo
+                .findByFIOAndBirthDate(
+                        firstName,lastName,middleName,from,to),AuthorWithoutBooks.class);
+    }
 }

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Genres</h2>
+
+<table id="genresList">
+
+</table>
+<br />
+<br />
+<input id="add_genre">
+<button onclick="addGenre()">Add new Genre</button>
+<label id="addError" for="add_genre">Добавить новый жанр</label>
+<br />
+<br />
+<input id="remove_genre">
+<button onclick="removeGenre()">Remove new Genre</button>
+<label id="removeError" for="add_genre">Удалить жанр</label>
+<br />
+<br />
+<input id="count_by_name">
+<button onclick="loadByGenre()">Load by genre</button>
+<label id="count_by_name_message" for="count_by_name">Получить количество книг по жанру</label>
+
+<script>
+    function loadGenres() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var genres = JSON.parse(this.responseText);
+                var html = '<tr>\n' +
+                    '        <th>Genre Name</th>\n' +
+                    '    </tr>';
+                for (var i = 0; i < genres.length; i++) {
+                    var genre = genres[i];
+                    console.log(genre);
+                    html = html +
+                        '        <td>' + genre.name + '</td></tr>';
+                }
+                document.getElementById("genresList").innerHTML = html;
+            }
+        };
+        xhttp.open("GET", "http://localhost:8888/genre/", true);
+        xhttp.send();
+    }
+   function addGenre() {
+       var name = document.getElementById("add_genre").value;
+       var xmlhttp = new XMLHttpRequest();
+       xmlhttp.open("POST", "http://localhost:8888/genre/");
+       xmlhttp.setRequestHeader("Content-Type", "application/json");
+       var json = JSON.stringify({name: name});
+       xmlhttp.send(json);
+       xmlhttp.onreadystatechange = function () {
+           if (this.status == 403) {
+               document.getElementById("addError").innerHTML =
+                   "<span style='color: red;'>Вам не разрешено данное действие</span>";
+           }
+       xmlhttp.onload = function () {
+               loadGenres();
+           }
+       }
+   }
+
+   function removeGenre() {
+       var name = document.getElementById("remove_genre").value;
+       var xmlhttp = new XMLHttpRequest();
+       xmlhttp.open("DELETE", "http://localhost:8888/genre/?name=" + name);
+       xmlhttp.send();
+       xmlhttp.onreadystatechange = function () {
+           if (this.status == 403) {
+               document.getElementById("removeError").innerHTML = "<span style='color: red;'>Вам не разрешено данное действие</span>";
+           } else if(this.status == 200) {
+               document.getElementById("removeError").innerHTML = "OK";
+           }else{
+               document.getElementById("removeError").innerHTML = this.responseText;
+           }
+           xmlhttp.onload = function () {
+               loadGenres();
+           }
+       }
+   }
+   
+   function loadByGenre() {
+       var name = document.getElementById("count_by_name").value;
+       var xmlhttp = new XMLHttpRequest();
+       xmlhttp.open("GET", "http://localhost:8888/genre/" + name);
+       xmlhttp.send();
+       xmlhttp.onreadystatechange = function () {
+           if (this.status == 200) {
+       document.getElementById("count_by_name_message").innerHTML ="Количество книг: "
+           + this.responseText;
+       }else{
+               document.getElementById("count_by_name_message").innerHTML =
+                   this.responseText;
+           }
+       }
+   }
+    loadGenres();
+</script>
+</body>
+</html>
