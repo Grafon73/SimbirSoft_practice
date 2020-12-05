@@ -58,7 +58,7 @@ public class BookServiceImpl implements BookService {
         BookEntity bookEntity= bookRepo.findById(id).orElseThrow(()->
               new DataNotFoundException(
               "Книги с ID "+id+" нет в базе данных"));
-        if(!bookEntity.getPersons().isEmpty()){
+        if(bookEntity.getPersons()!= null && !bookEntity.getPersons().isEmpty()){
             throw new CustomRuntimeException("Книгу нельзя удалить, пока она у человека");
         }
         bookRepo.deleteById(id);

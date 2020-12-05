@@ -73,7 +73,6 @@ public class AuthorServiceImpl implements AuthorService {
 
         }
      authorRepo.delete(authorEntity);
-
     }
 
     @Override

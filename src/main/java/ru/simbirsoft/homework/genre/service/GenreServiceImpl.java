@@ -49,8 +49,10 @@ public class GenreServiceImpl implements GenreService {
         GenreEntity genre = genreRepo.findByName(name)
                 .orElseThrow(() ->
                         new DataNotFoundException("Этого жанра нет в базе данных"));
-        List<BookEntity> books = new ArrayList<>(genre.getBooks());
-        books.forEach(genre::removeBook);
+        if(genre.getBooks()!=null){
+            List<BookEntity> books = new ArrayList<>(genre.getBooks());
+            books.forEach(genre::removeBook);
+        }
         genreRepo.delete(genre);
     }
 }

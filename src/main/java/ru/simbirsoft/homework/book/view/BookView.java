@@ -2,7 +2,9 @@ package ru.simbirsoft.homework.book.view;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.simbirsoft.homework.author.view.AuthorWithoutBooks;
 import ru.simbirsoft.homework.genre.view.GenreView;
@@ -17,6 +19,8 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookView {
 
     /**

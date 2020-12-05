@@ -1,101 +1,267 @@
 databaseChangeLog:
-
   - changeSet:
-      id: DEV-1
-      author: grafon
+      id:  createTables
+      author:  Grafon73
       changes:
-        -sql:
-          sql:
-            DROP ALL OBJECTS; CREATE TABLE IF NOT EXISTS users( username VARCHAR(50) NOT NULL, password VARCHAR(100) NOT NULL, enabled TINYINT NOT NULL DEFAULT 1, PRIMARY KEY (username)); CREATE TABLE IF NOT EXISTS authorities ( username VARCHAR(50) NOT NULL, authority VARCHAR(50) NOT NULL, FOREIGN KEY (username) REFERENCES users(username) ); CREATE TABLE IF NOT EXISTS genre ( genre_id INTEGER NOT NULL COMMENT 'ID жанра' PRIMARY KEY AUTO_INCREMENT, version INTEGER NOT NULL COMMENT 'Служебное поле hibernate', genre_name VARCHAR(50) NOT NULL COMMENT 'Название жанра', create_date TIMESTAMP
-            WITH TIME ZONE NOT NULL COMMENT 'Время создания записи', update_date TIMESTAMP
-            WITH TIME ZONE COMMENT 'Время изменения записи' ); COMMENT
-            ON TABLE genre IS 'Жанр'; CREATE TABLE IF NOT EXISTS author ( author_id INTEGER NOT NULL COMMENT 'ID автора' PRIMARY KEY AUTO_INCREMENT, version INTEGER NOT NULL COMMENT 'Служебное поле hibernate', first_name VARCHAR(50) NOT NULL COMMENT 'Имя', last_name VARCHAR(50) NOT NULL COMMENT 'Фамилия', middle_name VARCHAR(50) COMMENT 'Отчество', birth_date DATE COMMENT 'Дата рождения', create_date TIMESTAMP
-            WITH TIME ZONE NOT NULL COMMENT 'Время создания записи', update_date TIMESTAMP
-            WITH TIME ZONE COMMENT 'Время изменения записи' ); COMMENT
-            ON TABLE author IS 'Автор'; CREATE TABLE IF NOT EXISTS person ( person_id INTEGER NOT NULL COMMENT 'ID человека' PRIMARY KEY AUTO_INCREMENT, version INTEGER NOT NULL COMMENT 'Служебное поле hibernate', birth_date DATE COMMENT 'Дата рождения', first_name VARCHAR(50) NOT NULL COMMENT 'Имя', last_name VARCHAR(50) NOT NULL COMMENT 'Фамилия', middle_name VARCHAR(50) COMMENT 'Отчество', create_date TIMESTAMP
-            WITH TIME ZONE NOT NULL COMMENT 'Время создания записи', update_date TIMESTAMP
-            WITH TIME ZONE COMMENT 'Время изменения записи', username VARCHAR(50) COMMENT 'Логин', FOREIGN KEY (username) REFERENCES users(username) ); COMMENT
-            ON TABLE person IS 'Человек'; CREATE TABLE IF NOT EXISTS book ( book_id INTEGER NOT NULL COMMENT 'ID книги' PRIMARY KEY AUTO_INCREMENT, version INTEGER NOT NULL COMMENT 'Служебное поле hibernate', name VARCHAR(50) COMMENT 'Название книги', author_id INTEGER NOT NULL COMMENT 'ID автора', admission_date DATE COMMENT 'Дата поступления', publication_date DATE COMMENT 'Дата издания', create_date TIMESTAMP
-            WITH TIME ZONE NOT NULL COMMENT 'Время создания записи', update_date TIMESTAMP
-            WITH TIME ZONE COMMENT 'Время изменения записи' ); COMMENT
-            ON TABLE book IS 'Книга'; CREATE TABLE IF NOT EXISTS book_genre ( book_id INTEGER NOT NULL COMMENT 'ID книги', genre_id INTEGER NOT NULL COMMENT 'ID жанра' ); COMMENT
-            ON TABLE book IS 'Связь Книги с Жанром'; CREATE TABLE IF NOT EXISTS library_card ( card_id INTEGER NOT NULL COMMENT 'ID записи' PRIMARY KEY AUTO_INCREMENT, book_book_id INTEGER NOT NULL COMMENT 'ID книги', person_person_id INTEGER NOT NULL COMMENT 'ID человека', version INTEGER NOT NULL COMMENT 'Служебное поле hibernate', create_date TIMESTAMP
-            WITH TIME ZONE NOT NULL COMMENT 'Время создания записи', update_date TIMESTAMP
-            WITH TIME ZONE COMMENT 'Время изменения записи', return_date TIMESTAMP
-            WITH TIME ZONE NOT NULL COMMENT 'Время возврата книги', in_library BOOLEAN COMMENT 'Находится ли книга в библиотеке' ); COMMENT
-            ON TABLE book IS 'Связь Книги с Жанром(библиотечная карточка)'; CREATE UNIQUE INDEX ix_auth_username
-            ON authorities (username,authority);
+        -  createTable:
+             tableName:  users
+             columns:
+               -  column:
+                    name:  username
+                    type:  varchar(50)
+                    constraints:
+                      primaryKey:  true
+                      nullable: false
+               - column:
+                   name:  password
+                   type:  varchar(100)
+                   constraints:
+                     nullable: false
+               - column:
+                   name:  enabled
+                   type:  tinyint
+                   constraints:
+                     nullable: false
 
-            INSERT INTO users (username, password, enabled) VALUES
-            ('admin','$2a$10$t5NAlUsRLszZokBz7P1cReOqrcWfeqKMEPFlO0Q1HtNcVB0JVALnK',1),
-            ('1','$2y$12$qv5EH9tPkOtTe2DlKwkHVuyFc3LEaIWINEVRLZO04j5gcyl0EguVe',1),
-            ('2','$2y$12$bjlSCh3h1lnc6oj.6R2yRusu7VzkK5yJUAPUR.rmspzZv8vc5.kvq',1),
-            ('3','$2y$12$/PmV8hnx3LqMBEHlqVcAkO48W0jXp2.RGy1m0ktRDsT/vUOTTbiqG',1),
-            ('4','$2y$12$2wMIb6I8vUlljseu2jSUuedMp.yvT7Gek1DW9LZvX2F8/jbCxdcFa',1);
+        - createTable:
+            tableName:   authorities
+            columns:
+              - column:
+                  name:  username
+                  type:  varchar(50)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: authorities_username
+                    references: users(username)
+              - column:
+                  name:  authority
+                  type:  varchar(50)
+                  constraints:
+                    nullable: false
 
-            INSERT INTO authorities (username, authority) VALUES
-            ('admin', 'ROLE_ADMIN'),
-            ('1', 'ROLE_USER'),
-            ('2', 'ROLE_USER'),
-            ('3', 'ROLE_USER'),
-            ('4', 'ROLE_USER');
+        - createTable:
+            tableName:   genre
+            columns:
+              - column:
+                  name:  genre_id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    nullable: false
+                    primaryKey:  true
+              - column:
+                  name:  version
+                  type:  int
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  genre_name
+                  type:  varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  create_date
+                  type:  timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  update_date
+                  type:  timestamp with time zone
 
-            INSERT INTO AUTHOR(VERSION, FIRST_NAME, LAST_NAME, MIDDLE_NAME, BIRTH_DATE, CREATE_DATE, UPDATE_DATE) VALUES
-            (0, 'Илья', 'Бугынин', 'Витальевич', '2019-11-19', now(), null),
-            (0, 'Дмитрий', 'Ипастов', 'Олегович', '2020-11-19', now(),null),
-            (0, 'Виталий', 'Горин', 'Александрович', '2018-11-19',now(), null),
-            (0, 'Олег', 'Резин', 'Степанович', '2017-11-19', now(), null),
-            (0, 'Иван', 'Бочкин', 'Евгеньевич', '2016-11-19', now(), null);
+        - createTable:
+            tableName:   author
+            columns:
+              - column:
+                  name:  author_id
+                  type:  int
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
 
-            INSERT INTO GENRE(VERSION,GENRE_NAME, CREATE_DATE, UPDATE_DATE) VALUES
-            (0, 'Ужасы', now(), null),
-            (0, 'Фантастика', now(), null),
-            (0, 'Приключения', now(), null),
-            (0, 'Драма', now(), null),
-            (0, 'Детектив',now(), null);
+              - column:
+                  name:  version
+                  type:  int
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  first_name
+                  type:  varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  last_name
+                  type:  varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  middle_name
+                  type:  varchar(50)
+              - column:
+                  name:  birth_date
+                  type:  date
+              - column:
+                  name:  create_date
+                  type:  timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  update_date
+                  type:  timestamp with time zone
 
-            INSERT INTO PERSON(VERSION, BIRTH_DATE, FIRST_NAME, LAST_NAME, MIDDLE_NAME, CREATE_DATE, UPDATE_DATE, USERNAME) VALUES
-            (0, '2001-01-01', 'Олег', 'Резин', 'Степанович', now(), null,'1'),
-            (0, '2001-01-01', 'Иван', 'Бочкин', 'Евгеньевич', now(), null,'2'),
-            (0, '2001-01-01', 'Дмитрий', 'Королев', 'Иванович', now(), null,'3'),
-            (0, '2001-01-01', 'Егор', 'Лапин', 'Валерьевич', now(), null,'4'),
-            (0, '2001-01-01', 'Александр', 'Белугин', 'Александрович', now(), null,'admin');
+        - createTable:
+            tableName:   person
+            columns:
+              - column:
+                  name:  person_id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    nullable: false
+                    primaryKey:  true
+              - column:
+                  name:  version
+                  type:  int
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  first_name
+                  type:  varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  last_name
+                  type:  varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  middle_name
+                  type:  varchar(50)
+              - column:
+                  name:  birth_date
+                  type:  date
+              - column:
+                  name:  create_date
+                  type:  timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  update_date
+                  type:  timestamp with time zone
+              - column:
+                  name:  username
+                  type:  varchar(50)
+                  constraints:
+                    foreignKeyName: users_username
+                    references: users(username)
 
-            INSERT INTO BOOK (VERSION, NAME, AUTHOR_ID, ADMISSION_DATE, PUBLICATION_DATE, CREATE_DATE, UPDATE_DATE) VALUES
-            (0, 'Удивительное приключение',1,'2020-11-19','2020-11-18', now(), null),
-            (0, 'Страна чудес',2,'2020-11-19','2019-11-18', now(),null),
-            (0, 'Битва',3,'2020-11-19','2018-11-18', now(), null),
-            (0, 'За горизонтом',4,'2020-11-19','2017-11-18', now(), null),
-            (0, 'Светлое будущее',3,'2020-11-19','2016-11-18', now(), null),
-            (0, 'Цвет красок',1,'2020-11-19','2015-11-18', now(), null),
-            (0, 'Земля будущего',5,'2020-11-19','2014-11-18', now(), null);
+        - createTable:
+            tableName:   book
+            columns:
+              - column:
+                  name:  book_id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    nullable: false
+                    primaryKey:  true
+              - column:
+                  name:  version
+                  type:  int
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  name
+                  type:  varchar(50)
+              - column:
+                  name:  author_id
+                  type:  int
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  admission_date
+                  type:  date
+              - column:
+                  name:  publication_date
+                  type:  date
+              - column:
+                  name:  create_date
+                  type:  timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  update_date
+                  type:  timestamp with time zone
 
-            INSERT INTO BOOK_GENRE  (BOOK_ID, GENRE_ID) VALUES
-            (1,1),
-            (1,2),
-            (1,3),
-            (2,2),
-            (2,1),
-            (3,1),
-            (4,1),
-            (3,3),
-            (4,4),
-            (5,5),
-            (6,1),
-            (7,1);
+        - createTable:
+            tableName:   book_genre
+            columns:
+              - column:
+                  name:  book_id
+                  type:  int
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  genre_id
+                  type:  int
+                  constraints:
+                    nullable: false
 
-            INSERT INTO LIBRARY_CARD(CARD_ID, BOOK_BOOK_ID, PERSON_PERSON_ID,VERSION, CREATE_DATE, RETURN_DATE, UPDATE_DATE, IN_LIBRARY) VALUES
-            (1,1,1,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-18T08:51:52.447763100+04:00[Europe/Samara]',null,true),
-            (2,2,2,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-18T08:51:52.447763100+04:00[Europe/Samara]',null,true),
-            (3,3,3,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-26T08:51:52.447763100+04:00[Europe/Samara]',null,true),
-            (4,6,1,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-26T08:51:52.447763100+04:00[Europe/Samara]',null,true),
-            (5,7,1,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-26T08:51:52.447763100+04:00[Europe/Samara]',null,true),
-            (6,1,1,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-18T08:51:52.447763100+04:00[Europe/Samara]',null,false),
-            (7,2,2,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-18T08:51:52.447763100+04:00[Europe/Samara]',null,false),
-            (8,3,3,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-26T08:51:52.447763100+04:00[Europe/Samara]',null,false),
-            (9,6,1,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-26T08:51:52.447763100+04:00[Europe/Samara]',null,false),
-            (10,7,1,0,'2020-11-19T08:51:52.447763100+04:00[Europe/Samara]','2020-11-26T08:51:52.447763100+04:00[Europe/Samara]',null,false);
-
-
-
-
+        - createTable:
+            tableName:   library_card
+            columns:
+              - column:
+                  name:  card_id
+                  type:  int
+                  autoIncrement:  true
+                  constraints:
+                    nullable: false
+                    primaryKey:  true
+              - column:
+                  name:  version
+                  type:  int
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  book_book_id
+                  type:  int
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  person_person_id
+                  type:  int
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  create_date
+                  type:  timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  update_date
+                  type:  timestamp with time zone
+              - column:
+                  name:  return_date
+                  type:  timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name:  in_library
+                  type:  boolean
+        -  createIndex:
+             tableName: authorities
+             indexName: ux_auth_username
+             columns:
+               -  column:
+                    name:  username
+               - column:
+                   name:  authority
+             unique:  true
+  - changeSet:
+      id:  addData
+      author:  Grafon73
+      changes:
+        - sqlFile:
+            dbms: h2
+            encoding: UTF-8
+            path: data.sql
