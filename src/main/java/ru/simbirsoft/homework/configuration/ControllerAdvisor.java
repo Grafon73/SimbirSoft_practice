@@ -27,5 +27,4 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
                                .getDefaultMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
-
 }

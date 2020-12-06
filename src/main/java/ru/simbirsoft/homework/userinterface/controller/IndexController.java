@@ -21,12 +21,11 @@ public class IndexController {
             model.addAttribute("role",auth.getAuthorities());
         }else{
             model.addAttribute("name", auth.getName());
-
         }
         return "index";
     }
     @GetMapping("/login")
-    public String login(Model model) {
+    public String loginGet(Model model) {
         return "login";
     }
     @GetMapping("/ui/authors")

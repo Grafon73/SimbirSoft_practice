@@ -2,7 +2,7 @@ package ru.simbirsoft.homework.userinterface.service;
 
 import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.simbirsoft.homework.exception.DataNotFoundException;
 import ru.simbirsoft.homework.mapper.MyCustomMapperForPerson;
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final Argon2PasswordEncoder passwordEncoder;
     private final MapperFactory mapperFactory;
 
     public boolean saveUser(User user) {
@@ -28,12 +28,11 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         user.setRole(new Role(user.getUsername(), "ROLE_USER"));
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEnabled(true);
         userRepo.save(user);
         return true;
     }
-
     public PersonView loadByUsername(String username){
         Optional<User> userFromDB = userRepo.findByUsername(username);
         User user = userFromDB.orElseThrow(()->

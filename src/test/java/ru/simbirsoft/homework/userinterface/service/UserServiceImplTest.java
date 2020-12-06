@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.simbirsoft.homework.exception.DataNotFoundException;
@@ -29,7 +30,7 @@ class UserServiceImplTest {
     @Mock
     UserRepo userRepo;
     @Mock
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    Argon2PasswordEncoder passwordEncoder;
     @Mock
     MapperFactory mapperFactory;
     @InjectMocks
