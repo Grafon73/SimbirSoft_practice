@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.simbirsoft.homework.aop.annotations.LogHistory;
+import ru.simbirsoft.homework.aop.annotations.LogTime;
 import ru.simbirsoft.homework.librarycard.service.LibraryService;
 import ru.simbirsoft.homework.librarycard.view.LibraryView;
 
@@ -20,6 +22,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @Api(value = "LibraryController", description = "Управление записями о взятых книгах")
+@LogTime
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/library", produces = APPLICATION_JSON_VALUE)
@@ -31,6 +34,7 @@ public class LibraryController {
     @Secured(value = {"ROLE_ADMIN"})
     @PutMapping("/")
     @ApiOperation(value = "Продление срока возврата книги", httpMethod = "PUT")
+    @LogHistory
     public ResponseEntity<LibraryView> addDays(@RequestParam Integer bookID,
                                                @RequestParam Integer personID,
                                                @RequestParam Integer days) {

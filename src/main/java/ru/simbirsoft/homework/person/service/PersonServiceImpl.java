@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.simbirsoft.homework.aop.annotations.LogException;
+import ru.simbirsoft.homework.aop.annotations.LogMethodsWithoutArgs;
 import ru.simbirsoft.homework.book.model.BookEntity;
 import ru.simbirsoft.homework.book.repository.BookRepo;
 import ru.simbirsoft.homework.book.view.BookView;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@LogMethodsWithoutArgs
 public class PersonServiceImpl implements PersonService{
 
     private final PersonRepo personRepo;
@@ -45,6 +48,7 @@ public class PersonServiceImpl implements PersonService{
     }
 
     @Override
+    @LogException
     public List<BookView> getPersonsBooks(Integer id) {
         PersonEntity personEntity = personRepo
                 .findById(id)
@@ -68,6 +72,7 @@ public class PersonServiceImpl implements PersonService{
     }
 
     @Override
+    @LogException
     public PersonViewWithoutBooks editPerson(Integer id, PersonViewWithoutBooks personView) {
         PersonEntity personEntity = personRepo
                 .findById(id)
@@ -89,6 +94,7 @@ public class PersonServiceImpl implements PersonService{
     }
 
     @Override
+    @LogException
     public void removePerson(Integer id) {
         PersonEntity personEntity = personRepo
                 .findById(id)
@@ -103,6 +109,7 @@ public class PersonServiceImpl implements PersonService{
     }
 
     @Override
+    @LogException
     public void removePerson(PersonViewWithoutDateAndBooks personView) {
         List<PersonEntity> personEntity =
                 personRepo.findAllPersonEntityByFirstNameAndLastNameAndMiddleName(
@@ -126,6 +133,7 @@ public class PersonServiceImpl implements PersonService{
     }
 
     @Override
+    @LogException
     public PersonView borrowBook(Integer id, String name) {
         PersonEntity personEntity = personRepo.findById(id)
                 .orElseThrow(()->
@@ -153,6 +161,7 @@ public class PersonServiceImpl implements PersonService{
     }
 
     @Override
+    @LogException
     public PersonView returnBook(Integer id, String name) {
         PersonEntity personEntity = personRepo.findById(id).orElseThrow(()->
                 new DataNotFoundException(

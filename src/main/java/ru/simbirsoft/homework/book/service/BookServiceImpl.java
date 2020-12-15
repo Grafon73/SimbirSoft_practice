@@ -8,6 +8,8 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.simbirsoft.homework.aop.annotations.LogException;
+import ru.simbirsoft.homework.aop.annotations.LogMethodsWithoutArgs;
 import ru.simbirsoft.homework.author.model.AuthorEntity;
 import ru.simbirsoft.homework.author.repository.AuthorRepo;
 import ru.simbirsoft.homework.book.model.BookEntity;
@@ -29,6 +31,7 @@ import java.util.Set;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@LogMethodsWithoutArgs
 public class BookServiceImpl implements BookService {
 
     private final BookRepo bookRepo;
@@ -48,12 +51,12 @@ public class BookServiceImpl implements BookService {
                         bookView.getAuthor().getLastName(),
                         bookView.getAuthor().getMiddleName())
                 .ifPresent(bookEntity::setAuthor);
-
         bookRepo.save(bookEntity);
         return bookView;
     }
 
     @Override
+    @LogException
     public void removeBook(Integer id) {
         BookEntity bookEntity= bookRepo.findById(id).orElseThrow(()->
               new DataNotFoundException(
@@ -65,6 +68,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @LogException
     public BookView editGenre(BookViewWithoutAuthor bookView) {
       BookEntity bookEntity =  bookRepo.findByName(bookView.getName())
               .orElseThrow(() ->
@@ -80,6 +84,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @LogException
     public List<BookView> getBooksByAuthor (String firstName, String lastName, String middleName) {
         AuthorEntity authorEntity = new AuthorEntity();
         authorEntity.setFirstName(firstName);

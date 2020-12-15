@@ -6,8 +6,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.simbirsoft.homework.aop.annotations.LogTime;
 import ru.simbirsoft.homework.userinterface.service.UserService;
 
+@LogTime
 @Controller
 @RequiredArgsConstructor
 public class IndexController {

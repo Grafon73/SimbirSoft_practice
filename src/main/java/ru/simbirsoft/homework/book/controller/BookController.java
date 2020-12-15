@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.simbirsoft.homework.aop.annotations.LogHistory;
+import ru.simbirsoft.homework.aop.annotations.LogTime;
 import ru.simbirsoft.homework.book.repository.Attribute;
 import ru.simbirsoft.homework.book.service.BookService;
 import ru.simbirsoft.homework.book.view.BookView;
@@ -27,6 +29,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Api(value = "BookController", description = "Управление информацией о книгах")
+@LogTime
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/books", produces = APPLICATION_JSON_VALUE)
@@ -37,6 +40,7 @@ public class BookController {
     @PostMapping("/")
     @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Добавить книгу в список", httpMethod = "POST")
+    @LogHistory
     public ResponseEntity<BookView> addBook(@Valid @RequestBody BookView bookView) {
         return ResponseEntity.ok(bookService.addBook(bookView));
     }
@@ -44,6 +48,7 @@ public class BookController {
     @DeleteMapping("/")
     @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Удалить книгу из списка", httpMethod = "DELETE")
+    @LogHistory
     public ResponseEntity<String> removeBook(@RequestParam Integer id) {
         bookService.removeBook(id);
         return  ResponseEntity.ok("OK");
@@ -68,6 +73,7 @@ public class BookController {
     @PutMapping("/")
     @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Изменить жанр книги", httpMethod = "PUT")
+    @LogHistory
     public ResponseEntity<BookView> editGenre(@Valid @RequestBody BookViewWithoutAuthor bookView) {
         return ResponseEntity.ok(bookService.editGenre(bookView));
     }
