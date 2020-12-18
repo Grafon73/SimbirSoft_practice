@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.simbirsoft.homework.aop.annotations.LogException;
+import ru.simbirsoft.homework.aop.annotations.LogMethodsWithoutArgs;
 import ru.simbirsoft.homework.book.repository.BookRepo;
 import ru.simbirsoft.homework.exception.CustomRuntimeException;
 import ru.simbirsoft.homework.librarycard.model.LibraryCard;
@@ -17,6 +19,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@LogMethodsWithoutArgs
 public class LibraryServiceImpl implements LibraryService {
     private final LibraryRepo libraryRepo;
     private final MapperFactory mapperFactory;
@@ -34,6 +37,7 @@ public class LibraryServiceImpl implements LibraryService {
     }
 
     @Override
+    @LogException
     public LibraryView addDays(Integer bookId, Integer personId, Integer days) {
        if(!personRepo.findById(personId).isPresent()){
            throw new CustomRuntimeException("Человек с ID "+personId+" не найден");

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.simbirsoft.homework.aop.annotations.LogHistory;
+import ru.simbirsoft.homework.aop.annotations.LogTime;
 import ru.simbirsoft.homework.genre.service.GenreService;
 import ru.simbirsoft.homework.genre.view.GenreView;
 
@@ -23,6 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @Api(value = "GenreController", description = "Управление жанрами книг")
+@LogTime
 @RestController
 @RequestMapping(value = "/genre", produces = APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class GenreController {
     @PostMapping("/")
     @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Добавить жанр", httpMethod = "POST")
+    @LogHistory
     public ResponseEntity<GenreView> addGenre(@Valid @RequestBody GenreView genreView){
         genreService.add(genreView);
         return ResponseEntity.ok(genreView);
@@ -54,6 +58,7 @@ public class GenreController {
     @DeleteMapping("/")
     @Secured(value = {"ROLE_ADMIN"})
     @ApiOperation(value = "Удалить жанр", httpMethod = "DELETE")
+    @LogHistory
     public ResponseEntity<List<GenreView>> removeGenre(@RequestParam String name){
         genreService.remove(name);
         List<GenreView> genreViewList = genreService.getAllGenres();

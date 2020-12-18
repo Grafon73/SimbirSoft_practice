@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.simbirsoft.homework.aop.annotations.LogException;
 import ru.simbirsoft.homework.exception.DataNotFoundException;
 import ru.simbirsoft.homework.mapper.MyCustomMapperForPerson;
 import ru.simbirsoft.homework.person.model.PersonEntity;
@@ -33,6 +34,8 @@ public class UserServiceImpl implements UserService {
         userRepo.save(user);
         return true;
     }
+
+    @LogException
     public PersonView loadByUsername(String username){
         Optional<User> userFromDB = userRepo.findByUsername(username);
         User user = userFromDB.orElseThrow(()->

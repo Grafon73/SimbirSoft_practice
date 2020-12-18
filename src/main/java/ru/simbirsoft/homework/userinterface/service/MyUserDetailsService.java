@@ -14,7 +14,6 @@ import ru.simbirsoft.homework.userinterface.repository.UserRepo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 
