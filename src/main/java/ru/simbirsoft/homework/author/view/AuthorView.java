@@ -1,7 +1,9 @@
 package ru.simbirsoft.homework.author.view;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.simbirsoft.homework.book.view.BookViewWithoutAuthor;
 
@@ -14,6 +16,8 @@ import java.util.List;
  */
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthorView {
     /**
      * Имя

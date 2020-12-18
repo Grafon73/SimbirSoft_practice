@@ -1,9 +1,9 @@
 INSERT INTO users (username, password, enabled) VALUES
-('admin','$2a$10$t5NAlUsRLszZokBz7P1cReOqrcWfeqKMEPFlO0Q1HtNcVB0JVALnK',1),
-('1','$2y$12$qv5EH9tPkOtTe2DlKwkHVuyFc3LEaIWINEVRLZO04j5gcyl0EguVe',1),
-('2','$2y$12$bjlSCh3h1lnc6oj.6R2yRusu7VzkK5yJUAPUR.rmspzZv8vc5.kvq',1),
-('3','$2y$12$/PmV8hnx3LqMBEHlqVcAkO48W0jXp2.RGy1m0ktRDsT/vUOTTbiqG',1),
-('4','$2y$12$2wMIb6I8vUlljseu2jSUuedMp.yvT7Gek1DW9LZvX2F8/jbCxdcFa',1);
+('admin','$argon2id$v=19$m=4096,t=3,p=1$BdkuTidF6zojmLfm4TqLPg$jPGu3IhI0oxGrdfYpryPtOhDb2+DY/sLiVA9UpAxGa0',1),
+('1','$argon2id$v=19$m=4096,t=3,p=1$IyGvKDwO+DlxyFWYR1dmxQ$OAdLMgG26ir2zdW9hwwN8M2KISsEDSkjx5YyigkZkdc',1),
+('2','$argon2id$v=19$m=4096,t=3,p=1$cMFir4bssbe0HDY64OupXg$DLy2J7WBLf9yb0ANd+aIcxSGLhCqEVktsGKETZ0w/Pg',1),
+('3','$argon2id$v=19$m=4096,t=3,p=1$x8h0CYaNH2Q9t+kFqCyvTQ$E0AVOLvWt5Eot/s096Ee+NCSEIrJK4+jRGngaXNobu0',1),
+('4','$argon2id$v=19$m=4096,t=3,p=1$ye9LOVp/M/J7BUP9IB5CWQ$CS1Bh41XdhebiD/tG4dmm/x+RhI+cYpirzyBgJ4w2mc',1);
 
 INSERT INTO authorities (username, authority) VALUES
 ('admin', 'ROLE_ADMIN'),

@@ -91,7 +91,7 @@ public class PersonEntity {
             )
     private Set<LibraryCard> books;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username")
     private User user;
 

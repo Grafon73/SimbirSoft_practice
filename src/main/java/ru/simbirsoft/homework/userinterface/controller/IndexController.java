@@ -6,8 +6,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.simbirsoft.homework.aop.annotations.LogTime;
 import ru.simbirsoft.homework.userinterface.service.UserService;
 
+@LogTime
 @Controller
 @RequiredArgsConstructor
 public class IndexController {
@@ -21,12 +23,11 @@ public class IndexController {
             model.addAttribute("role",auth.getAuthorities());
         }else{
             model.addAttribute("name", auth.getName());
-
         }
         return "index";
     }
     @GetMapping("/login")
-    public String login(Model model) {
+    public String loginGet(Model model) {
         return "login";
     }
     @GetMapping("/ui/authors")

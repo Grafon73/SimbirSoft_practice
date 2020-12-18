@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.simbirsoft.homework.aop.annotations.LogException;
+import ru.simbirsoft.homework.aop.annotations.LogMethodsWithoutArgs;
 import ru.simbirsoft.homework.author.model.AuthorEntity;
 import ru.simbirsoft.homework.author.repository.AuthorRepo;
 import ru.simbirsoft.homework.author.repository.CustomAuthorRepo;
@@ -20,6 +22,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@LogMethodsWithoutArgs
 public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepo authorRepo;
@@ -32,6 +35,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @LogException
     public AuthorView listOfBooksByAuthor(Integer id) {
         AuthorEntity authorEntity = authorRepo.findById(id)
                 .orElseThrow(()-> new CustomRuntimeException("Автора нет в базе данных"));
@@ -39,6 +43,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @LogException
     public AuthorView addAuthor(AuthorView authorView) {
         AuthorEntity authorEntity = authorRepo
                 .findAuthorEntityByFirstNameAndLastNameAndMiddleName(
@@ -57,6 +62,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @LogException
     public void removeAuthor(Integer id) {
         AuthorEntity authorEntity = authorRepo
               .findById(id)
@@ -73,7 +79,6 @@ public class AuthorServiceImpl implements AuthorService {
 
         }
      authorRepo.delete(authorEntity);
-
     }
 
     @Override

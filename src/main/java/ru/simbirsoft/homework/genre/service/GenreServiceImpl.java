@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import ma.glasnost.orika.MapperFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.simbirsoft.homework.aop.annotations.LogException;
+import ru.simbirsoft.homework.aop.annotations.LogMethodsWithoutArgs;
 import ru.simbirsoft.homework.book.model.BookEntity;
 import ru.simbirsoft.homework.exception.DataNotFoundException;
 import ru.simbirsoft.homework.genre.model.GenreEntity;
@@ -19,6 +21,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@LogMethodsWithoutArgs
 public class GenreServiceImpl implements GenreService {
 
     private final GenreRepo genreRepo;
@@ -45,12 +48,15 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @LogException
     public void remove(String name) {
         GenreEntity genre = genreRepo.findByName(name)
                 .orElseThrow(() ->
                         new DataNotFoundException("Этого жанра нет в базе данных"));
-        List<BookEntity> books = new ArrayList<>(genre.getBooks());
-        books.forEach(genre::removeBook);
+        if(genre.getBooks()!=null){
+            List<BookEntity> books = new ArrayList<>(genre.getBooks());
+            books.forEach(genre::removeBook);
+        }
         genreRepo.delete(genre);
     }
 }

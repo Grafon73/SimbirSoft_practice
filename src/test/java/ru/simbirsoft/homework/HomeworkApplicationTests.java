@@ -1,13 +1,10 @@
 package ru.simbirsoft.homework;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.platform.suite.api.SelectPackages;
+import org.junit.runner.RunWith;
 
-@SpringBootTest
+@RunWith(JUnitPlatform.class)
+@SelectPackages("ru.simbirsoft.homework")
 class HomeworkApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
 }

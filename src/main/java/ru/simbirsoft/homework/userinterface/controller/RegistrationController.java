@@ -6,9 +6,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import ru.simbirsoft.homework.aop.annotations.LogHistory;
+import ru.simbirsoft.homework.aop.annotations.LogTime;
 import ru.simbirsoft.homework.userinterface.model.User;
 import ru.simbirsoft.homework.userinterface.service.UserService;
 
+@LogTime
 @Controller
 @RequiredArgsConstructor
 public class RegistrationController {
@@ -22,6 +25,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
+    @LogHistory
     public String addUser(@ModelAttribute("user") User user, Model model) {
         if (!userService.saveUser(user)){
             model.addAttribute("error", "Пользователь с таким именем уже существует");

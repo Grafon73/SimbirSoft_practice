@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.simbirsoft.homework.aop.annotations.LogHistory;
+import ru.simbirsoft.homework.aop.annotations.LogTime;
 import ru.simbirsoft.homework.book.view.BookView;
 import ru.simbirsoft.homework.person.service.PersonService;
 import ru.simbirsoft.homework.person.view.PersonView;
@@ -26,6 +28,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Api(value = "PersonController", description = "Управление информацией о людях")
+@LogTime
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/person", produces = APPLICATION_JSON_VALUE)
@@ -36,6 +39,7 @@ public class PersonController {
    @PostMapping("/")
    @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Добавить человека в список", httpMethod = "POST")
+   @LogHistory
    public ResponseEntity<PersonViewWithoutBooks> addPerson(@Valid @RequestBody PersonViewWithoutBooks personView){
       personService.addPerson(personView);
       return ResponseEntity.ok(personView);
@@ -43,7 +47,8 @@ public class PersonController {
 
    @PutMapping("/")
    @Secured(value = {"ROLE_ADMIN"})
-   @ApiOperation(value = "Изменить ифнормацию о человеке", httpMethod = "PUT")
+   @ApiOperation(value = "Изменить информацию о человеке", httpMethod = "PUT")
+   @LogHistory
    public ResponseEntity<PersonViewWithoutBooks> editPerson(
            @RequestParam Integer id,
            @Valid @RequestBody PersonViewWithoutBooks personView){
@@ -53,6 +58,7 @@ public class PersonController {
    @DeleteMapping("/{id}")
    @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Удалить человека из списка по ID", httpMethod = "DELETE")
+   @LogHistory
    public ResponseEntity<String> removePerson(@PathVariable Integer id) {
       personService.removePerson(id);
       return ResponseEntity.ok("OK");
@@ -61,6 +67,7 @@ public class PersonController {
    @DeleteMapping("/")
    @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Удалить человека из списка по ФИО", httpMethod = "DELETE")
+   @LogHistory
    public ResponseEntity<String> removePerson(
            @Valid @RequestBody PersonViewWithoutDateAndBooks personView) {
       personService.removePerson(personView);
@@ -75,6 +82,7 @@ public class PersonController {
    @PutMapping("/borrow")
    @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Добавить книгу в список книг человека", httpMethod = "PUT")
+   @LogHistory
    public ResponseEntity<PersonView> borrowBook(@RequestParam Integer personId,
                                                 @RequestParam String bookName){
       return ResponseEntity.ok(personService.borrowBook(personId,bookName));
@@ -83,6 +91,7 @@ public class PersonController {
    @PutMapping("/return")
    @Secured(value = {"ROLE_ADMIN"})
    @ApiOperation(value = "Убрать книгу из списка книг человека", httpMethod = "PUT")
+   @LogHistory
    public ResponseEntity<PersonView> returnBook(@RequestParam Integer personId,
                                                  @RequestParam String bookName){
       return ResponseEntity.ok(personService.returnBook(personId,bookName));

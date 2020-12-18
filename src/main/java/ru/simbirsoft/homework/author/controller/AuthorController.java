@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.simbirsoft.homework.aop.annotations.LogHistory;
+import ru.simbirsoft.homework.aop.annotations.LogTime;
 import ru.simbirsoft.homework.author.service.AuthorService;
 import ru.simbirsoft.homework.author.view.AuthorView;
 import ru.simbirsoft.homework.author.view.AuthorWithoutBooks;
@@ -29,6 +31,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/authors", produces = APPLICATION_JSON_VALUE)
+@LogTime
 public class AuthorController {
 
     private final AuthorService authorService;
@@ -36,12 +39,14 @@ public class AuthorController {
     @Secured(value = {"ROLE_ADMIN"})
     @PostMapping("/")
     @ApiOperation(value = "Добавить автора в список", httpMethod = "POST")
+    @LogHistory
     public ResponseEntity<AuthorView> addAuthor(@Valid  @RequestBody AuthorView authorView){
           return ResponseEntity.ok(authorService.addAuthor(authorView));
     }
     @Secured(value = {"ROLE_ADMIN"})
     @DeleteMapping("/{id}")
     @ApiOperation(value = "Удалить автора из списка", httpMethod = "DELETE")
+    @LogHistory
     public ResponseEntity<String> removeAuthor(@PathVariable Integer id){
         authorService.removeAuthor(id);
         return ResponseEntity.ok("OK");
